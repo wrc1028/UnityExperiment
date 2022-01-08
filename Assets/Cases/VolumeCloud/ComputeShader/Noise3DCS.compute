@@ -1,0 +1,48 @@
+#pragma kernel Noise3D
+
+// 一次只生成一个通道的值
+RWStructuredBuffer<float> NoiseResult;
+StructuredBuffer<float3> _Points;
+int _CellNums;
+int _Resolution;
+
+int2 GetRoundCellPos(int value, int cellNums)
+{
+    if (value == -1)  return int2(cellNums - 1, -1);
+    else if (value == cellNums) return int2(0, 1);
+    else return int2(value, 0);
+}
+
+float Worley3D(StructuredBuffer<float3> points, int cellNums, float3 samplePos)
+{
+    int3 cellID = floor(samplePos * cellNums);
+    float minDst = 2;
+    for (int x = -1; x < 2; x++)
+    {
+        for (int y = -1; y < 2; y++)
+        {
+            for (int z = -1; z < 2; z++)
+            {
+                int2 xIndex = GetRoundCellPos(cellID.x + x, cellNums);
+                int2 yIndex = GetRoundCellPos(cellID.y + y, cellNums);
+                int2 zIndex = GetRoundCellPos(cellID.z + z, cellNums);
+                int index = xIndex.x + (yIndex.x + zIndex.x * cellNums) * cellNums;
+                float3 targetPos = float3(xIndex.y, yIndex.y, zIndex.y) + points[index];
+                minDst = min(minDst, distance(samplePos, targetPos));
+            }
+        }
+    }
+    return minDst * cellNums;
+}
+
+[numthreads(64, 1, 1)]
+void Noise3D (uint3 id : SV_DispatchThreadID)
+{
+    // 计算采样点位置
+    int xIndex = (id.x % (_Resolution * _Resolution)) % _Resolution;
+    int yIndex = floor((id.x % (_Resolution * _Resolution)) / _Resolution);
+    int zIndex = floor(id.x / (_Resolution * _Resolution));
+    float3 samplePos = float3(xIndex, yIndex, zIndex) / (float)_Resolution;
+    int3 cellID = floor(samplePos * _CellNums);
+    NoiseResult[id.x] = 1 - Worley3D(_Points, _CellNums.x, samplePos);
+}

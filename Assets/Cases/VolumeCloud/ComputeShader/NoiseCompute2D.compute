@@ -1,0 +1,43 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Noise2D
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+StructuredBuffer<float2> _WorleyPoints;
+int _CellNums;
+
+int2 GetRoundCellPos(int value, int cellNums)
+{
+    if (value == -1)  return int2(cellNums - 1, -1);
+    else if (value == cellNums) return int2(0, 1);
+    else return int2(value, 0);
+}
+
+float Worley2D(StructuredBuffer<float2> points, int cellNums, float2 samplePos)
+{
+    // 获得采样点在哪个格子中间
+    int2 cellID = floor(samplePos * cellNums);
+    float minDst = 1;
+    for (int i = -1; i < 2; i++)
+    {
+        for (int j = -1; j < 2; j++)
+        {
+            int2 xIndex = GetRoundCellPos(cellID.x + i, cellNums);
+            int2 yIndex = GetRoundCellPos(cellID.y + j, cellNums);
+            int index = xIndex.x + yIndex.x * cellNums;
+            minDst = min(minDst, distance(samplePos, points[index] + int2(xIndex.y, yIndex.y)));
+        }
+    }
+    return minDst * cellNums;
+}
+
+
+[numthreads(8,8,1)]
+void Noise2D (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    Result.GetDimensions(width, height);
+    float r = Worley2D(_WorleyPoints, _CellNums, (float2)id.xy / width);
+    Result[id.xy] = half4(r, r, r, 1);
+}

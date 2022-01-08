@@ -1,0 +1,82 @@
+#pragma kernel Preview
+#pragma kernel Create3DTexture
+
+RWTexture2D<float4> Result;
+StructuredBuffer<float3> _Points01;
+StructuredBuffer<float3> _Points02;
+StructuredBuffer<float3> _Points03;
+int3 _CullNums;
+float _SlideValue;
+float _Persistence;
+bool _Invert;
+
+RWStructuredBuffer<float> NoiseResult;
+int _Resolution;
+
+int2 GetRoundCellPos(int value, int cellNums)
+{
+    if (value == -1)  return int2(cellNums - 1, -1);
+    else if (value == cellNums) return int2(0, 1);
+    else return int2(value, 0);
+}
+
+float Worley3D(StructuredBuffer<float3> points, int cellNums, float3 samplePos)
+{
+    int3 cellID = floor(samplePos * cellNums);
+    float minDst = 2;
+    for (int x = -1; x < 2; x++)
+    {
+        for (int y = -1; y < 2; y++)
+        {
+            for (int z = -1; z < 2; z++)
+            {
+                int2 xIndex = GetRoundCellPos(cellID.x + x, cellNums);
+                int2 yIndex = GetRoundCellPos(cellID.y + y, cellNums);
+                int2 zIndex = GetRoundCellPos(cellID.z + z, cellNums);
+                int index = xIndex.x + (yIndex.x + zIndex.x * cellNums) * cellNums;
+                float3 targetPos = float3(xIndex.y, yIndex.y, zIndex.y) + points[index];
+                minDst = min(minDst, distance(samplePos, targetPos));
+            }
+        }
+    }
+    return minDst * cellNums;
+}
+
+// float Overlay(float a, float b)
+// {
+//     if (a <= 0.5) return a * b * 2;
+//     else return 1 - (1 - a) * (1 - b);
+// }
+
+float CalculateResult(float3 samplePos)
+{
+    float result01 = Worley3D(_Points01, _CullNums.x, samplePos);
+    float result02 = Worley3D(_Points02, _CullNums.y, samplePos);
+    float result03 = Worley3D(_Points03, _CullNums.z, samplePos);
+    float finalResult = result01 + result02 * _Persistence + result03 * _Persistence * _Persistence;
+    finalResult /= (1 + _Persistence + _Persistence * _Persistence);
+    return _Invert ? finalResult : 1 - finalResult;
+}
+
+[numthreads(8,8,1)]
+void Preview(uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    Result.GetDimensions(width, height);
+    float3 samplePos = float3((float)id.x / width, (float)id.y / width, _SlideValue);
+    float finalResult = CalculateResult(samplePos);
+    Result[id.xy] = float4(finalResult, finalResult, finalResult, 1);
+}
+
+
+[numthreads(512, 1, 1)]
+void Create3DTexture(uint3 id : SV_DispatchThreadID)
+{
+    // 计算采样点位置
+    int xIndex = (id.x % (_Resolution * _Resolution)) % _Resolution;
+    int yIndex = floor((id.x % (_Resolution * _Resolution)) / _Resolution);
+    int zIndex = floor(id.x / (_Resolution * _Resolution));
+    float3 samplePos = float3(xIndex, yIndex, zIndex) / (float)_Resolution;
+    float finalResult = CalculateResult(samplePos);
+    NoiseResult[id.x] = finalResult;
+}

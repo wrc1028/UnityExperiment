@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e492173fb8ee16649a5bf75614ecdf46, type: 3}
+  m_Name: DetailSetting
+  m_EditorClassIdentifier: 
+  isFoldoutSetting: 0
+  currentNoiseSetting: {fileID: 11400000, guid: a5dbf2188928e2f4abd4190a72fa0cf7, type: 2}
+  textureSize: 128
+  resolution: 128
+  channel: 0
+  rSetting: {fileID: 11400000, guid: a5dbf2188928e2f4abd4190a72fa0cf7, type: 2}
+  gSetting: {fileID: 11400000, guid: 51ec97935ad4bf54b873bec02a20fcb0, type: 2}
+  bSetting: {fileID: 11400000, guid: 658cd5205a80939419db25fe372319e3, type: 2}
+  aSetting: {fileID: 11400000, guid: 0f678775dac87d84187584c95be26cdb, type: 2}
