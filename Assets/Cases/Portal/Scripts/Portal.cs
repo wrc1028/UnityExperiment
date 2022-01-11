@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 [ExecuteInEditMode]
 public class Portal : MonoBehaviour
@@ -17,7 +18,10 @@ public class Portal : MonoBehaviour
         portalCamera = GetComponentInChildren<Camera>();
         portalCamera.CopyFrom(mainCamera);
 
-
+        screenTexture = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
+        portalCamera.targetTexture = screenTexture;
+        portalCamera.Render();
+        screen.sharedMaterial.SetTexture("_MainTex", screenTexture);
     }
 
     private void Update()
@@ -25,13 +29,19 @@ public class Portal : MonoBehaviour
         PortalCameraRender();
     }
     
-    private void PortalCameraRender()
+    public void PortalCameraRender()
     {
         if (linkPortal == null) return;
-        Matrix4x4 portalMatrix = transform.localToWorldMatrix;
-        Matrix4x4 linkPortalMatrix = linkPortal.transform.worldToLocalMatrix;
-        Matrix4x4 transformMatrix = portalMatrix * linkPortalMatrix * mainCamera.transform.localToWorldMatrix;
+        // 更改相机位置
+        Matrix4x4 transformMatrix = GetPortalMatrix();
         portalCamera.transform.SetPositionAndRotation(transformMatrix.GetColumn(3), transformMatrix.rotation);
     }
 
+    private Matrix4x4 GetPortalMatrix()
+    {
+        Matrix4x4 portalL2WMatrix = linkPortal.transform.localToWorldMatrix;
+        portalL2WMatrix[0, 0] *= -1; portalL2WMatrix[0, 2] *= -1;
+        portalL2WMatrix[2, 0] *= -1; portalL2WMatrix[2, 2] *= -1;
+        return portalL2WMatrix * transform.worldToLocalMatrix * mainCamera.transform.localToWorldMatrix;
+    }
 }
