@@ -81,7 +81,7 @@ Shader "Custom/VolumeCloudShader"
             float LightAbsorptionTowardCloud;
             float4 DarknessThreshold;
 
-
+            // 包围盒算法
             float2 RayBoxDst(float3 boundMin, float3 boundMax, float3 rayOrigin, float3 rayDir)
             {
                 float3 t0 = (boundMin - rayOrigin) / rayDir;
@@ -96,6 +96,7 @@ Shader "Custom/VolumeCloudShader"
                 float dstInsideBox = max(0, dstB - dstToBox);
                 return float2(dstToBox, dstInsideBox);
             }
+            
             float HGFunc(float cos_angle, float g)
             {
                 float g2 = g * g;

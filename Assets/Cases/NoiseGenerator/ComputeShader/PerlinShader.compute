@@ -1,0 +1,79 @@
+#pragma kernel PreviewResult
+
+RWTexture2D<float4> TextureResult;
+StructuredBuffer<float2> _RandomVector;
+int _CellNums;
+
+StructuredBuffer<float3> _RandomVector3;
+float _Depth;
+
+int GetIndexFromID2(int2 id)
+{
+    if (id.x == _CellNums) id.x = 0;
+    if (id.y == _CellNums) id.y = 0;
+    return id.x + id.y * _CellNums;
+}
+
+float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
+{
+    float weight = (value - oldMin) / (oldMax - oldMin);
+    return weight * (newMax - newMin) + newMin;
+}
+
+float PerlinNoise2D(float2 samplerPos)
+{
+    int2 vectorID = floor(samplerPos);
+    float2 localUV = frac(samplerPos);
+
+    float a = dot(_RandomVector[GetIndexFromID2(vectorID)], localUV);
+    float b = dot(_RandomVector[GetIndexFromID2(vectorID + int2(1, 0))], localUV - float2(1, 0));
+    float c = dot(_RandomVector[GetIndexFromID2(vectorID + int2(0, 1))], localUV - float2(0, 1));
+    float d = dot(_RandomVector[GetIndexFromID2(vectorID + int2(1, 1))], localUV - float2(1, 1));
+
+    float2 smoothLocalUV = smoothstep(0.0, 1.0, localUV);
+    float result = lerp(lerp(a, b, smoothLocalUV.x), lerp(c, d, smoothLocalUV.x), smoothLocalUV.y);
+    result = Remap(-0.2, 1, 0, 1, result);
+    result = floor(result * 20) / 20;
+    return result;
+}
+
+int GetIndexFromID3(int3 id)
+{
+    if (id.x == _CellNums) id.x = 0;
+    if (id.y == _CellNums) id.y = 0;
+    if (id.z == _CellNums) id.z = 0;
+    return id.x + _CellNums * (id.y + _CellNums * id.z);
+}
+
+float PerlinNoise3D(float3 samplerPos)
+{
+    int3 vectorID = floor(samplerPos);
+    float3 localUV = frac(samplerPos);
+
+    float a = dot(_RandomVector3[GetIndexFromID3(vectorID)], localUV);
+    float b = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(1, 0, 0))], localUV - float3(1, 0, 0));
+    float c = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(0, 1, 0))], localUV - float3(0, 1, 0));
+    float d = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(0, 0, 1))], localUV - float3(0, 0, 1));
+    float _e = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(1, 1, 0))], localUV - float3(1, 1, 0));
+    float f = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(1, 0, 1))], localUV - float3(1, 0, 1));
+    float g = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(0, 1, 1))], localUV - float3(0, 1, 1));
+    float h = dot(_RandomVector3[GetIndexFromID3(vectorID + int3(1, 1, 1))], localUV - float3(1, 1, 1));
+
+    float3 smoothLocalUV = smoothstep(0.0, 1.0, localUV);
+
+    float result01 = lerp(lerp(a, b, smoothLocalUV.x), lerp(c, _e, smoothLocalUV.x), smoothLocalUV.y);
+    float result02 = lerp(lerp(d, f, smoothLocalUV.x), lerp(g, h, smoothLocalUV.x), smoothLocalUV.y);
+    float result = lerp(result01, result02, smoothLocalUV.z);
+    // result = floor(result * 20) / 20;
+    return result;
+}
+
+[numthreads(8,8,1)]
+void PreviewResult (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    TextureResult.GetDimensions(width, height);
+    float2 uv = (float2)id.xy / (float)width;
+    float3 uvw = float3(uv, _Depth);
+    TextureResult[id.xy] = float4(PerlinNoise3D(uvw * _CellNums).xxx, 1);
+}

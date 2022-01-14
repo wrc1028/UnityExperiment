@@ -51,6 +51,22 @@ Shader "Unlit/RaySphere"
 
 
             float4x4 _CameraInverseProjection;
+
+            float2 RaySphereDst(float3 center, float radius, float3 rayOrigin, float3 rayDir)
+            {
+                float3 rayOriginToCenter = center - rayOrigin;
+                float rayBottom = dot(rayOriginToCenter, rayDir);
+                float centerToRay2 = dot(rayOriginToCenter, rayOriginToCenter) - rayBottom * rayBottom;
+                float rBottom2 = radius * radius - centerToRay2;
+                if (rBottom2 >= 0)
+                {
+                    float rBottom = sqrt(rBottom2);
+                    float dstToSphere = rayBottom - rBottom;
+                    float dstInsideSphere = dstToSphere < 0 ? rayBottom + rBottom : rBottom * 2;
+                    return float2(dstToSphere, dstInsideSphere);
+                }
+                return float2(1.#INF, 0);
+            }
             // TODO: 优化
             float4 RaySphere(float3 center, float radius, float height, float3 rayOrigin, float3 rayDir)
             {
@@ -132,12 +148,27 @@ Shader "Unlit/RaySphere"
                 float linearDepth = LinearEyeDepth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos)));
                 float3 rayOrigin = i.rayOrigin;
                 fixed3 rayDir = -normalize(i.viewDir);
-                float4 raySphereResult = RaySphere(_RaySphereCenter, _SphereRadius, _SphereHeight, rayOrigin, rayDir);
-                
+                // 旧包围盒算法
+                // float4 raySphereResult = RaySphere(_RaySphereCenter, _SphereRadius, _SphereHeight, rayOrigin, rayDir);
+                // if (raySphereResult.y > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.x, raySphereResult.y, linearDepth);
+                // if (raySphereResult.w > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.z, raySphereResult.w, linearDepth);
+                // 新包围盒算法
                 float density = 0;
-                if (raySphereResult.y > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.x, raySphereResult.y, linearDepth);
-                if (raySphereResult.w > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.z, raySphereResult.w, linearDepth);
-                
+                float2 hitOuterSphere = RaySphereDst(_RaySphereCenter, _SphereRadius + _SphereHeight, rayOrigin, rayDir);
+                float2 firstThroughInfo = 0;
+                float2 secondThroughInfo = 0;
+                if (hitOuterSphere.y > 0)
+                {
+                    float2 hitInnerSphere = RaySphereDst(_RaySphereCenter, _SphereRadius, rayOrigin, rayDir);
+                    if (hitInnerSphere.y > 0)
+                    {
+                        firstThroughInfo = float2(max(0, hitOuterSphere.x), (hitOuterSphere.y - hitInnerSphere.y + min(0, hitOuterSphere.x) + min(0, hitInnerSphere.x)) / 2);
+                        secondThroughInfo = float2(max(0, hitInnerSphere.x) + hitInnerSphere.y, (hitOuterSphere.y - hitInnerSphere.y - min(0, hitOuterSphere.x) + min(0, hitInnerSphere.x)) / 2);
+                    }
+                    else firstThroughInfo = float2(max(0, hitOuterSphere.x), hitOuterSphere.y);
+                }
+                if (firstThroughInfo.y > 0) density += DensityMarch(rayOrigin, rayDir, firstThroughInfo.x, firstThroughInfo.y, linearDepth);
+                if (secondThroughInfo.y > 0) density += DensityMarch(rayOrigin, rayDir, secondThroughInfo.x, secondThroughInfo.y, linearDepth);
                 return col * exp(-density);
             }
             ENDCG

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44014865, g: 0.48866898, b: 0.5688548, a: 1}
+  m_IndirectSpecularColor: {r: 0.43802208, g: 0.48599237, b: 0.5662694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -440,13 +440,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.52996004, y: 0.19589868, z: -0.25232068, w: 0.7855574}
+  m_LocalRotation: {x: 0.63666505, y: 0.03477599, z: -0.13829394, w: 0.75784105}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 111.332, y: -533.633, z: 148.737}
+  m_LocalEulerAnglesHint: {x: 102.94101, y: -573.432, z: 132.419}
 --- !u!1 &738158476
 GameObject:
   m_ObjectHideFlags: 0
@@ -640,7 +640,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   volumeCloudShader: {fileID: 4800000, guid: 845246b488bb3c642a8eae6bce8eb755, type: 3}
   cloudContainer: {fileID: 1842661325}
-  stepNums: 107
+  stepNums: 80
   lightStepNums: 8
   heightGradientTexture: {fileID: 2800000, guid: b4fabe84665c45f48b8d0319780fcd42, type: 3}
   curlNoiseTexture: {fileID: 2800000, guid: 3a69f44636d508d4b8e0fe8926a57d0b, type: 3}
@@ -658,7 +658,7 @@ MonoBehaviour:
   detailNoiseOffset: {x: 3.6, y: 0, z: 0, w: 0.01}
   detailMoveDirAndSpeed: {x: 1, y: 0, z: 0, w: 0.1}
   lightAbsorptionTowardSun: 0.04
-  lightAbsorptionTowardCloud: 0.43
+  lightAbsorptionTowardCloud: 0.28
   darknessThreshold: {x: 0.11, y: 0.92, z: 0.36, w: 0.02}
 --- !u!1 &1149730338
 GameObject:
