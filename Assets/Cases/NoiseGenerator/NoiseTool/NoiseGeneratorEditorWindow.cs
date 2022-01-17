@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -17,40 +18,56 @@ namespace Custom.Noise
 
         // GUIStyle
         private GUIStyle lineSytle;
+        // compute shader
+        private ComputeShader noiseGenerateCS;
+        private int previewkernel;
+
+        private List<ComputeBuffer> buffersToRelease;
         // left
         public Channel channel;
-        public RenderTexture prevRT;
-        private RenderTexture prevRTR;
-        private RenderTexture prevRTG;
-        private RenderTexture prevRTB;
-        private RenderTexture prevRTA;
+        public RenderTexture previewRT;
         public Dimensionality dimensionality;
         public SaveType saveType;
         public Resolution2D resolution2D;
         public float samplerDepth;
         public Resolution3D resolution3D;
+        // right
+        public NoiseBase[] noiseDatas;
+        // save data
         private int resolution;
         private string extension;
         private string savePath;
-        // right
-        public NoiseBase[] noiseDatas;
         
         private void OnEnable()
         {
+            // 初始化设置
+            channel = Channel.R;
+            previewRT = CreateRenderTexture(256, 256, RenderTextureFormat.ARGB32);
+            dimensionality = Dimensionality._2DTexture;
+            saveType = SaveType.PNG;
+            resolution2D = Resolution2D._256x256;
+            samplerDepth = 0;
+            resolution3D = Resolution3D._64x64;
+
+            // 白线
             lineSytle = new GUIStyle();
             lineSytle.normal.background = Texture2D.whiteTexture;
 
+            // 初始化数据
             noiseDatas = new NoiseBase[4];
-            noiseDatas[0] = new NoiseBase();
-            noiseDatas[1] = new NoiseBase();
-            noiseDatas[2] = new NoiseBase();
-            noiseDatas[3] = new NoiseBase();
+            noiseDatas[(int)Channel.R] = new NoiseBase();
+            noiseDatas[(int)Channel.R].Layer01.isUsed = true;
+            noiseDatas[(int)Channel.G] = new NoiseBase();
+            noiseDatas[(int)Channel.B] = new NoiseBase();
+            noiseDatas[(int)Channel.A] = new NoiseBase();
 
-            prevRT = CreateRenderTexture(256, 256, RenderTextureFormat.ARGB32);
-            prevRTR = CreateRenderTexture(256, 256, RenderTextureFormat.R8);
-            prevRTG = CreateRenderTexture(256, 256, RenderTextureFormat.R8);
-            prevRTB = CreateRenderTexture(256, 256, RenderTextureFormat.R8);
-            prevRTA = CreateRenderTexture(256, 256, RenderTextureFormat.R8);
+            // 加载ComputeShader
+            noiseGenerateCS = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Cases/NoiseGenerator/ComputeShader/NoiseGenerate.compute");
+            buffersToRelease = new List<ComputeBuffer>();
+            if (noiseGenerateCS != null)
+            {
+                previewkernel = noiseGenerateCS.FindKernel("Preview");
+            }
         }
 
         private RenderTexture CreateRenderTexture(int width, int height, RenderTextureFormat format)
@@ -65,25 +82,8 @@ namespace Custom.Noise
         {
             GUILayout.BeginHorizontal();
             DrawLeftContent();
-            switch (channel)
-            {
-                case Channel.R:
-                    DrawRightContent(ref noiseDatas[0]);
-                    UpdatePreviewTexture(noiseDatas[0]);
-                    break;
-                case Channel.G:
-                    DrawRightContent(ref noiseDatas[1]);
-                    UpdatePreviewTexture(noiseDatas[1]);
-                    break;
-                case Channel.B:
-                    DrawRightContent(ref noiseDatas[2]);
-                    UpdatePreviewTexture(noiseDatas[2]);
-                    break;
-                default:
-                    DrawRightContent(ref noiseDatas[3]);
-                    UpdatePreviewTexture(noiseDatas[3]);
-                    break;
-            }
+            DrawRightContent(ref noiseDatas[(int)channel]);
+            UpdatePreviewTexture(noiseDatas[(int)channel], ref previewRT);
             GUILayout.EndHorizontal();
         }
 
@@ -100,9 +100,9 @@ namespace Custom.Noise
                 
             }
             GUILayout.EndHorizontal();
-            GUILayout.Label(prevRT, GUILayout.Width(256), GUILayout.Height(256));
+            GUILayout.Label(previewRT, GUILayout.Width(256), GUILayout.Height(256));
             GUILayout.Space(5);
-            dimensionality = (Dimensionality)EditorGUILayout.EnumPopup("维度选择", dimensionality);
+            dimensionality = (Dimensionality)EditorGUILayout.EnumPopup("2D&3D", dimensionality);
             if (dimensionality == Dimensionality._3DTexture)
             {
                 samplerDepth = EditorGUILayout.Slider("采样深度", samplerDepth, 0, 1);
@@ -126,20 +126,22 @@ namespace Custom.Noise
         }
 
         // 绘制右边的内容:噪声图类型选择，多层噪声图叠加设置等
-        private void DrawRightContent(ref NoiseBase noiseDatas)
+        private void DrawRightContent(ref NoiseBase noiseBase)
         {
             GUILayout.BeginVertical();
             EditorGUIUtility.labelWidth = 60;
             GUILayout.BeginArea(new Rect(286, 10, 424, 460));
-            DrawLayerTextureSetting(1, ref noiseDatas.Layer01);
-            if (noiseDatas.Layer01.isStartUsing)
+            DrawLayerTextureSetting(1, ref noiseBase.Layer01);
+            if (noiseBase.Layer01.isUsed)
             {
-                DrawLayerTextureSetting(2, ref noiseDatas.Layer02);
-                if (noiseDatas.Layer02.isStartUsing)
+                if (noiseBase.previewRT == null)
+                    noiseBase.previewRT = CreateRenderTexture(256, 256, RenderTextureFormat.ARGB32);
+                DrawLayerTextureSetting(2, ref noiseBase.Layer02);
+                if (noiseBase.Layer02.isUsed)
                 {
-                    DrawLayerTextureSetting(3, ref noiseDatas.Layer03);
-                    if (noiseDatas.Layer03.isStartUsing)
-                        DrawLayerTextureSetting(4, ref noiseDatas.Layer04);
+                    DrawLayerTextureSetting(3, ref noiseBase.Layer03);
+                    if (noiseBase.Layer03.isUsed)
+                        DrawLayerTextureSetting(4, ref noiseBase.Layer04);
                 }
             }
             GUILayout.EndArea();
@@ -148,27 +150,84 @@ namespace Custom.Noise
 
         private void DrawLayerTextureSetting(int layerNum, ref NoiseBase.NoiseData noiseData)
         {
-            noiseData.isStartUsing = EditorGUILayout.Toggle(string.Format("第{0}层", layerNum), noiseData.isStartUsing);
-            if (!noiseData.isStartUsing) return;
+            GUILayout.BeginHorizontal();
+            noiseData.isUsed = EditorGUILayout.Toggle(string.Format("第{0}层", layerNum), noiseData.isUsed);
+            if (!noiseData.isUsed) return;
+            noiseData.isInvert = EditorGUILayout.Toggle("颜色反转", noiseData.isInvert);
+            EditorGUI.BeginChangeCheck();
+            noiseData.noiseType = (NoiseType)EditorGUILayout.EnumPopup("噪声类型", noiseData.noiseType);
+            if (EditorGUI.EndChangeCheck())
+            {
+                NoiseBase.CreateRandomValue(out noiseData.randomPoints, noiseData.subdivideNum, noiseData.noiseType);
+            }
+            GUILayout.EndHorizontal();
             
             GUILayout.Label(String.Empty, lineSytle, GUILayout.Height(1));
-            noiseData.mixWeight = EditorGUILayout.Slider("混合权重", noiseData.mixWeight, 0, 1);
-            noiseData.noiseType = (NoiseType)EditorGUILayout.EnumPopup("噪声类型", noiseData.noiseType);
+            noiseData.mixWeight = EditorGUILayout.Slider("混合权重", noiseData.mixWeight, 0.001f, 1);
 
             noiseData.subdivideNum = EditorGUILayout.IntSlider("细分数", noiseData.subdivideNum, 1, 32);
             if (noiseData.prevSubdivideNum != noiseData.subdivideNum)
             {
-                NoiseBase.CreateRandomValue(out noiseData.randomValue, noiseData.subdivideNum);
+                NoiseBase.CreateRandomValue(out noiseData.randomPoints, noiseData.subdivideNum, noiseData.noiseType);
                 noiseData.prevSubdivideNum = noiseData.subdivideNum;
             }
-
-            noiseData.isInvert = EditorGUILayout.Toggle("反转颜色", noiseData.isInvert);
-            GUILayout.Space(15);
+            EditorGUILayout.MinMaxSlider("数据映射", ref noiseData.minValue, ref noiseData.maxValue, -1, 1);
+            GUILayout.Space(20);
         }
 
-        private void UpdatePreviewTexture(NoiseBase noiseBase)
+        private void UpdatePreviewTexture(NoiseBase noiseBase, ref RenderTexture previewRT)
         {
+            // 如果计算着色器不存在或者当前通道的第一层未被使用，不渲染
+            if (noiseGenerateCS == null || !noiseBase.Layer01.isUsed) 
+            {
+                previewRT = null;
+                return;
+            }
+            // left prop
+            noiseGenerateCS.SetFloat("_SamplerDepth", samplerDepth);
+            // right prop
+            SingleLayerNoiseSetting[] settings = new SingleLayerNoiseSetting[4];
+            settings[0] = SetComputeBuffer(noiseBase.Layer01, 1);
+            settings[1] = SetComputeBuffer(noiseBase.Layer02, 2);
+            settings[2] = SetComputeBuffer(noiseBase.Layer03, 3);
+            settings[3] = SetComputeBuffer(noiseBase.Layer04, 4);
             
+            int stride = sizeof(float) * 3 + sizeof(int) * 3;
+            CreateComputeBuffer(settings, stride, "_Settings", previewkernel);
+
+            noiseGenerateCS.SetTexture(previewkernel, "PreviewResult", noiseBase.previewRT);
+            noiseGenerateCS.Dispatch(previewkernel, 32, 32, 1);
+            previewRT = noiseBase.previewRT;
+            // 清空buffer缓存
+            foreach (var buffer in buffersToRelease)
+            {
+                buffer.Release();
+            }
+        }
+        private SingleLayerNoiseSetting SetComputeBuffer(NoiseBase.NoiseData noiseData, int indexLayer)
+        {
+            SingleLayerNoiseSetting setting = new SingleLayerNoiseSetting();
+            // 当前层被启用
+            if (noiseData.isUsed)
+            {
+                setting.noiseType = (int)noiseData.noiseType;
+                setting.mixWeight = noiseData.mixWeight;
+                setting.subdivideNum = noiseData.subdivideNum;
+                setting.isInvert = noiseData.isInvert ? 1 : 0;
+                setting.minValue = noiseData.minValue;
+                setting.maxValue = noiseData.maxValue;
+            }
+            else setting.noiseType = -1;
+
+            CreateComputeBuffer(noiseData.randomPoints, sizeof(float) * 3, string.Format("_Points0{0}", indexLayer), previewkernel);
+            return setting;
+        }
+        private void CreateComputeBuffer(System.Array data, int stride, string bufferName, int kernelHandle)
+        {
+            ComputeBuffer buffer = new ComputeBuffer(data.Length, stride);
+            buffer.SetData(data);
+            buffersToRelease.Add(buffer);
+            noiseGenerateCS.SetBuffer(kernelHandle, bufferName, buffer);
         }
     }
 }

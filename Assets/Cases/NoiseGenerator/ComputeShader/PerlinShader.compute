@@ -7,17 +7,17 @@ int _CellNums;
 StructuredBuffer<float3> _RandomVector3;
 float _Depth;
 
+float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
+{
+    float weight = (value - oldMin) / (oldMax - oldMin);
+    return weight * (newMax - newMin) + newMin;
+}
+
 int GetIndexFromID2(int2 id)
 {
     if (id.x == _CellNums) id.x = 0;
     if (id.y == _CellNums) id.y = 0;
     return id.x + id.y * _CellNums;
-}
-
-float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
-{
-    float weight = (value - oldMin) / (oldMax - oldMin);
-    return weight * (newMax - newMin) + newMin;
 }
 
 float PerlinNoise2D(float2 samplerPos)

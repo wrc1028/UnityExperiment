@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   perlinShader: {fileID: 7200000, guid: 715b15bcf4e9f32408fec1fe520bf0f2, type: 3}
-  subdivideNum: 8
+  subdivideNum: 4
   resolution: 1024
   depthSampler: 0
 --- !u!23 &853376267
