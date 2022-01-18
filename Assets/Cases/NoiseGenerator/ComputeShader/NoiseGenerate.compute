@@ -1,6 +1,10 @@
 // 预览的函数入口
 #pragma kernel Preview
+#pragma kernel OutputTexture2D
+#pragma kernel CombineChannel
+#pragma kernel OutputResult
 
+bool _IsTowDimension;
 float _SamplerDepth;
 struct NoiseSetting
 {
@@ -17,8 +21,23 @@ StructuredBuffer<float3> _Points02;
 StructuredBuffer<float3> _Points03;
 StructuredBuffer<float3> _Points04;
 StructuredBuffer<NoiseSetting> _Settings;
+// 预览参数
 RWTexture2D<float4> PreviewResult;
+// 贴图输出参数
+RWTexture2D<float> SingleChannelResult;
+Texture2D<float> _RChannel;
+Texture2D<float> _GChannel;
+Texture2D<float> _BChannel;
+Texture2D<float> _AChannel;
+RWTexture2D<float4> Texture2DResult;
+int _Resolution;
+RWStructuredBuffer<float> SingleLayerResult;
 
+float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
+{
+    float weight = (value - oldMin) / (oldMax - oldMin);
+    return weight * (newMax - newMin) + newMin;
+}
 // Normal noise
 float Hash33(float3 p)
 {
@@ -26,12 +45,6 @@ float Hash33(float3 p)
 	return frac(sin(q) * 43758.5453);
 }
 // Perlin noise
-float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
-{
-    float weight = (value - oldMin) / (oldMax - oldMin);
-    return weight * (newMax - newMin) + newMin;
-}
-
 int GetIndexFromID3(int3 id, int cellNums)
 {
     if (id.x == cellNums) id.x = 0;
@@ -40,19 +53,35 @@ int GetIndexFromID3(int3 id, int cellNums)
     return id.x + cellNums * (id.y + cellNums * id.z);
 }
 
+float PerlinNoise2D(float2 uv, int cellNums, StructuredBuffer<float3> points)
+{
+    int3 vectorID = floor(float3(uv, 0) * cellNums);
+    float2 localUV = frac(uv * cellNums);
+
+    float a = dot(normalize(points[GetIndexFromID3(vectorID, cellNums)].xy), localUV);
+    float b = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 0, 0), cellNums)].xy), localUV - float2(1, 0));
+    float c = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 1, 0), cellNums)].xy), localUV - float2(0, 1));
+    float d = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 1, 0), cellNums)].xy), localUV - float2(1, 1));
+
+    float2 smoothLocalUV = smoothstep(0.0, 1.0, localUV);
+    float result = lerp(lerp(a, b, smoothLocalUV.x), lerp(c, d, smoothLocalUV.x), smoothLocalUV.y);
+    result = Remap(-0.2, 1, 0, 1, result);
+    return result;
+}
+
 float PerlinNoise3D(float3 uvw, int cellNums, StructuredBuffer<float3> points)
 {
     int3 vectorID = floor(uvw * cellNums);
     float3 localUVW = frac(uvw * cellNums);
 
-    float a = dot(normalize(points[GetIndexFromID3(vectorID, cellNums)] * 2 - 1), localUVW);
-    float b = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 0, 0), cellNums)] * 2 - 1), localUVW - float3(1, 0, 0));
-    float c = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 1, 0), cellNums)] * 2 - 1), localUVW - float3(0, 1, 0));
-    float d = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 1, 0), cellNums)] * 2 - 1), localUVW - float3(1, 1, 0));
-    float m = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 0, 1), cellNums)] * 2 - 1), localUVW - float3(0, 0, 1));
-    float n = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 0, 1), cellNums)] * 2 - 1), localUVW - float3(1, 0, 1));
-    float o = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 1, 1), cellNums)] * 2 - 1), localUVW - float3(0, 1, 1));
-    float p = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 1, 1), cellNums)] * 2 - 1), localUVW - float3(1, 1, 1));
+    float a = dot(normalize(points[GetIndexFromID3(vectorID, cellNums)]), localUVW);
+    float b = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 0, 0), cellNums)]), localUVW - float3(1, 0, 0));
+    float c = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 1, 0), cellNums)]), localUVW - float3(0, 1, 0));
+    float d = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 1, 0), cellNums)]), localUVW - float3(1, 1, 0));
+    float m = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 0, 1), cellNums)]), localUVW - float3(0, 0, 1));
+    float n = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 0, 1), cellNums)]), localUVW - float3(1, 0, 1));
+    float o = dot(normalize(points[GetIndexFromID3(vectorID + int3(0, 1, 1), cellNums)]), localUVW - float3(0, 1, 1));
+    float p = dot(normalize(points[GetIndexFromID3(vectorID + int3(1, 1, 1), cellNums)]), localUVW - float3(1, 1, 1));
 
     float3 smoothLocalUVW = smoothstep(0.0, 1.0, localUVW);
 
@@ -66,6 +95,24 @@ int2 GetRoundCellPos(int value, int cellNums)
     if (value == -1)  return int2(cellNums - 1, -1);
     else if (value == cellNums) return int2(0, 1);
     else return int2(value, 0);
+}
+
+float WorleyNoise2D(float2 uv, int cellNums, StructuredBuffer<float3> points)
+{
+    int2 cellID = floor(uv * cellNums);
+    float minDst = 2;
+    for (int y = -1; y < 2; y++)
+    {
+        for (int x = -1; x < 2; x++)
+        {
+            int2 xIndex = GetRoundCellPos(cellID.x + x, cellNums);
+            int2 yIndex = GetRoundCellPos(cellID.y + y, cellNums);
+            int index = xIndex.x + yIndex.x * cellNums;
+            float2 targetPos = float2(xIndex.y, yIndex.y) + points[index].xy;
+            minDst = min(minDst, distance(uv, targetPos));
+        }
+    }
+    return 1 - minDst * cellNums;
 }
 
 float WorleyNoise3D(float3 uvw, int cellNums, StructuredBuffer<float3> points)
@@ -98,33 +145,33 @@ float CalculateNoise(float3 uvw, NoiseSetting setting, StructuredBuffer<float3> 
         int3 cellID = floor(uvw * setting.cellNums);
         int index = cellID.x + setting.cellNums * (cellID.y + setting.cellNums * cellID.z);
         float result = Hash33(points[index]);
-        result = Remap((setting.minValue + 1) / 2, (setting.maxValue + 1) / 2, 0, 1, result);
+        result = Remap(setting.minValue, setting.maxValue, 0, 1, result);
         return setting.isInvert ? 1 - result : result;
     }
     // worley噪声
     else if (setting.noiseType == 1) 
     {
-        float result = WorleyNoise3D(uvw, setting.cellNums, points);
-        result = Remap((setting.minValue + 1) / 2, (setting.maxValue + 1) / 2, 0, 1, result);
+        float result = _IsTowDimension ? 
+            WorleyNoise2D(uvw.xy, setting.cellNums, points) : 
+            WorleyNoise3D(uvw, setting.cellNums, points);
+        result = Remap(setting.minValue, setting.maxValue, 0, 1, result);
         return setting.isInvert ? 1 - result : result;
     }
     // perlin 噪声
     else if (setting.noiseType == 2) 
     {
-        float result = PerlinNoise3D(uvw, setting.cellNums, points);
-        result = Remap(setting.minValue, setting.maxValue, 0, 1, result);
+        float result = _IsTowDimension ? 
+            PerlinNoise2D(uvw.xy, setting.cellNums, points) : 
+            PerlinNoise3D(uvw, setting.cellNums, points);
+        result = Remap(setting.minValue, setting.maxValue, 0, 1, (result + 1) * 0.5);
         return setting.isInvert ? 1 - result : result;
     }
     // 无
     else return 0;
 }
 
-[numthreads(8,8,1)]
-void Preview (uint3 id : SV_DispatchThreadID)
+float GetMixResult(float3 uvw)
 {
-    uint width, height;
-    PreviewResult.GetDimensions(width, height);
-    float3 uvw = float3((float2)id.xy / (float)width, _SamplerDepth);
     float4 results = float4(1, 0, 0, 0);
 
     results.x = CalculateNoise(uvw, _Settings[0], _Points01);
@@ -133,6 +180,40 @@ void Preview (uint3 id : SV_DispatchThreadID)
     results.w = CalculateNoise(uvw, _Settings[3], _Points04);
 
     float4 mixWeight = float4(_Settings[0].mixWeight, _Settings[1].mixWeight, _Settings[2].mixWeight, _Settings[3].mixWeight);
-    float result = dot(results, mixWeight / dot(mixWeight, 1));
-    PreviewResult[id.xy] = float4(result.xxx, 1);
+    return dot(results, mixWeight / dot(mixWeight, 1));
+}
+
+[numthreads(8,8,1)]
+void Preview (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    PreviewResult.GetDimensions(width, height);
+    float3 uvw = float3((float2)id.xy / width, _SamplerDepth);
+    PreviewResult[id.xy] = float4(GetMixResult(uvw).xxx, 1);
+}
+
+// 先输出灰度图，在对灰度图进行叠加
+[numthreads(8,8,1)]
+void OutputTexture2D (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    SingleChannelResult.GetDimensions(width, height);
+    float3 uvw = float3((float2)id.xy / width, 0);
+    SingleChannelResult[id.xy] = GetMixResult(uvw);
+}
+// 合并通道
+[numthreads(8,8,1)]
+void CombineChannel (uint3 id : SV_DispatchThreadID)
+{
+    Texture2DResult[id.xy] = float4(_RChannel[id.xy], _GChannel[id.xy], _BChannel[id.xy], _AChannel[id.xy]);
+}
+// 输出一个同都的(混合)数据
+[numthreads(256,1,1)]
+void OutputResult (uint3 id : SV_DispatchThreadID)
+{
+    int xIndex = (id.x % (_Resolution * _Resolution)) % _Resolution;
+    int yIndex = floor((id.x % (_Resolution * _Resolution)) / _Resolution);
+    int zIndex = floor(id.x / (_Resolution * _Resolution));
+    float3 uvw = float3(xIndex, yIndex, zIndex) / (float)_Resolution;
+    SingleLayerResult[id.x] = GetMixResult(uvw);
 }

@@ -25,7 +25,7 @@ namespace Custom.Noise
     {
         public int noiseType;
         public float mixWeight;
-        public int subdivideNum;
+        public int cellNums;
         public int isInvert;
         public float minValue;
         public float maxValue;
@@ -38,7 +38,7 @@ namespace Custom.Noise
             public bool isUsed;
             public float mixWeight;
             public NoiseType noiseType;
-            public int subdivideNum;
+            public int cellNums;
             public int prevSubdivideNum;
             public bool isInvert;
             public Vector3[] randomPoints;
@@ -49,7 +49,6 @@ namespace Custom.Noise
         public NoiseData Layer02;
         public NoiseData Layer03;
         public NoiseData Layer04;
-        public RenderTexture previewRT;
         public Vector4 MixWeight 
         { 
             get
@@ -63,28 +62,28 @@ namespace Custom.Noise
         {
             Layer01.isUsed = false;
             Layer01.mixWeight = 1;
-            Layer01.subdivideNum = 4;
-            Layer01.minValue = -1;
+            Layer01.cellNums = 4;
+            Layer01.minValue = 0;
             Layer01.maxValue = 1;
-            CreateRandomValue(out Layer01.randomPoints, Layer01.subdivideNum, Layer01.noiseType);
+            CreateRandomValue(out Layer01.randomPoints, Layer01.cellNums, Layer01.noiseType);
 
             Layer02.isUsed = false;
-            Layer02.subdivideNum = 8;
-            Layer02.minValue = -1;
+            Layer02.cellNums = 8;
+            Layer02.minValue = 0;
             Layer02.maxValue = 1;
-            CreateRandomValue(out Layer02.randomPoints, Layer02.subdivideNum, Layer02.noiseType);
+            CreateRandomValue(out Layer02.randomPoints, Layer02.cellNums, Layer02.noiseType);
 
             Layer03.isUsed = false;
-            Layer03.subdivideNum = 12;
-            Layer03.minValue = -1;
+            Layer03.cellNums = 12;
+            Layer03.minValue = 0;
             Layer03.maxValue = 1;
-            CreateRandomValue(out Layer03.randomPoints, Layer03.subdivideNum, Layer03.noiseType);
+            CreateRandomValue(out Layer03.randomPoints, Layer03.cellNums, Layer03.noiseType);
 
             Layer04.isUsed = false;
-            Layer04.subdivideNum = 16;
-            Layer04.minValue = -1;
+            Layer04.cellNums = 16;
+            Layer04.minValue = 0;
             Layer04.maxValue = 1;
-            CreateRandomValue(out Layer04.randomPoints, Layer04.subdivideNum, Layer04.noiseType);
+            CreateRandomValue(out Layer04.randomPoints, Layer04.cellNums, Layer04.noiseType);
         }
 
         /// <summary>
@@ -107,6 +106,12 @@ namespace Custom.Noise
                         {
                             offsetPos += new Vector3(x, y, z);
                             offsetPos /= subdivideNum;
+                        }
+                        else if (noiseType == NoiseType.Perlin)
+                        {
+                            offsetPos.x = offsetPos.x * 2 - 1;
+                            offsetPos.y = offsetPos.y * 2 - 1;
+                            offsetPos.z = offsetPos.z * 2 - 1;
                         }
                         result[index] = offsetPos;
                     }
