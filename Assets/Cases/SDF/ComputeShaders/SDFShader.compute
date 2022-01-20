@@ -1,0 +1,58 @@
+#pragma kernel SDF
+#pragma kernel SDFRegion
+#define SIZEX 32
+#define SIZEY 32
+#define MAXDST 30
+
+int2 _PixelID;
+Texture2D<float> _OriginTexture;
+RWStructuredBuffer<float> DstResult;
+RWTexture2D<float> Result;
+
+[numthreads(SIZEX, SIZEY, 1)]
+void SDF (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _OriginTexture.GetDimensions(width, height);
+    // 先求外部的距离场
+    float result = 0;
+    if (_OriginTexture[id.xy] > 0.9)
+    {
+        float dst = distance(_PixelID, id.xy);
+        float normalizeDst = dst >= MAXDST ? 1 : dst / MAXDST;
+        result = normalizeDst;
+    }
+    else result = 1;
+    int index = id.x + id.y * height;
+    DstResult[index] = result;
+}
+
+float CalcalateDstInBox(int2 pixelID, int boxSize, int resolution)
+{
+    float minDst = 1;
+    float currentPixelValue = _OriginTexture[pixelID];
+    float offset = 1.0 / MAXDST;
+    for (int x = -boxSize; x <= boxSize; x++)
+    {
+        for (int y = -boxSize; y <= boxSize; y++)
+        {
+            int xIndex = pixelID.x + x;
+            int yIndex = pixelID.y + y;
+            bool indexOutOfRange = xIndex < 0 || xIndex > resolution - 1 || yIndex < 0 || yIndex > resolution - 1;
+            if (indexOutOfRange || _OriginTexture[int2(xIndex, yIndex)] == currentPixelValue) continue;
+            float dst = distance(pixelID, int2(xIndex, yIndex));
+            float normalizeDst = dst >= boxSize ? 1 : dst / boxSize;
+            minDst = min(normalizeDst, minDst);
+        }
+    }
+    float result = currentPixelValue > 0.5 ?  currentPixelValue + minDst - offset / MAXDST : 1 - minDst + offset;
+    return result * 0.5;
+}
+
+[numthreads(SIZEX, SIZEY, 1)]
+void SDFRegion (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _OriginTexture.GetDimensions(width, height);
+    Result[id.xy] = CalcalateDstInBox(id.xy, MAXDST, width);
+}

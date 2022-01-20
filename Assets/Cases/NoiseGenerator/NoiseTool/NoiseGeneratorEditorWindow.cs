@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Drawing;
 using System.IO;
@@ -7,6 +8,10 @@ using UnityEngine;
 using UnityEditor;
 namespace Custom.Noise
 {
+    // 结构还需要优化
+    // 找生成噪声的论文，让噪声更加合理
+    // 多加入几个噪声类型
+    // 与地形工具联动
     public class NoiseGeneratorEditorWindow : EditorWindow 
     {
         [MenuItem("UnityExperiment/NoiseGenerator")]
@@ -128,7 +133,6 @@ namespace Custom.Noise
                 resolution = dimensionality == Dimensionality._2DTexture ? (int)resolution2D : (int)resolution3D;
                 extension = dimensionality == Dimensionality._2DTexture ? saveType.ToString() : "asset";
                 savePath = EditorUtility.SaveFilePanel("贴图保存", Application.dataPath, "New Textrue", extension);
-                Debug.Log(savePath);
                 if (dimensionality == Dimensionality._2DTexture) OutputTexture2D(savePath, resolution, saveType);
                 else
                 {
@@ -192,6 +196,7 @@ namespace Custom.Noise
         private void CalculateTexture2D(NoiseBase noiseBase, ref RenderTexture resultRT, string resultName, int kernelHandle)
         {
             // 如果计算着色器不存在，不渲染
+            // TODO: 显示第二层的情况
             if (noiseGenerateCS == null) return;
             // left prop
             noiseGenerateCS.SetBool("_IsTowDimension", dimensionality == Dimensionality._2DTexture);

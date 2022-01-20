@@ -15,7 +15,7 @@ MonoBehaviour:
   layer01DivisionNum: 4
   layer02DivisionNum: 8
   layer03DivisionNum: 12
-  persistence: 0.358
+  persistence: 0.354
   sliderValue: 0
   isInvert: 0
   layer01Points:

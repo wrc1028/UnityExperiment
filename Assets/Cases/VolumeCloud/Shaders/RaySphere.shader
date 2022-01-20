@@ -67,41 +67,6 @@ Shader "Unlit/RaySphere"
                 }
                 return float2(1.#INF, 0);
             }
-            // TODO: 优化
-            float4 RaySphere(float3 center, float radius, float height, float3 rayOrigin, float3 rayDir)
-            {
-                float dstToCenter = distance(rayOrigin, center);
-                fixed3 rayOriginToCenterDir = normalize(center - rayOrigin);
-                half cosAngle = dot(rayDir, rayOriginToCenterDir);
-                float dstToRay = dstToCenter * sqrt(1 - cosAngle * cosAngle);
-                // 半径内部
-                if (dstToCenter <= radius)
-                {
-                    float bottom_r = sqrt(radius * radius - dstToRay * dstToRay);
-                    float bottom_R = sqrt((radius + height) * (radius + height) - dstToRay * dstToRay);
-                    return float4(dstToCenter * cosAngle + bottom_r, bottom_R - bottom_r, 0, 0);
-                }
-                // 云层外
-                else if (dstToCenter > (radius + height))
-                {
-                    if (cosAngle < 0 || dstToRay > (radius + height)) return 0;
-                    else
-                    {
-                        float bottom_r = sqrt(max(0, radius * radius - dstToRay * dstToRay));
-                        float bottom_R = sqrt(max(0, (radius + height) * (radius + height) - dstToRay * dstToRay));
-                        return bottom_r == 0 ? float4(dstToCenter * cosAngle - bottom_R, bottom_R * 2, 0, 0) : 
-                            float4(dstToCenter * cosAngle - bottom_R, bottom_R - bottom_r, dstToCenter * cosAngle + bottom_r, bottom_R - bottom_r);
-                    }
-                }
-                // 云层里
-                else
-                {
-                    float bottom_r = sqrt(max(0, radius * radius - dstToRay * dstToRay));
-                    float bottom_R = sqrt((radius + height) * (radius + height) - dstToRay * dstToRay);
-                    return (bottom_r == 0 || cosAngle < 0) ? float4(0, dstToCenter * cosAngle + bottom_R, 0, 0) : 
-                        float4(0, dstToCenter * cosAngle - bottom_r, dstToCenter * cosAngle + bottom_r, bottom_R - bottom_r);
-                }
-            }
 
             float SamplerDensity(float3 samplerPosition)
             {
@@ -148,11 +113,7 @@ Shader "Unlit/RaySphere"
                 float linearDepth = LinearEyeDepth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos)));
                 float3 rayOrigin = i.rayOrigin;
                 fixed3 rayDir = -normalize(i.viewDir);
-                // 旧包围盒算法
-                // float4 raySphereResult = RaySphere(_RaySphereCenter, _SphereRadius, _SphereHeight, rayOrigin, rayDir);
-                // if (raySphereResult.y > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.x, raySphereResult.y, linearDepth);
-                // if (raySphereResult.w > 0) density += DensityMarch(rayOrigin, rayDir, raySphereResult.z, raySphereResult.w, linearDepth);
-                // 新包围盒算法
+                // 包围盒
                 float density = 0;
                 float2 hitOuterSphere = RaySphereDst(_RaySphereCenter, _SphereRadius + _SphereHeight, rayOrigin, rayDir);
                 float2 firstThroughInfo = 0;
