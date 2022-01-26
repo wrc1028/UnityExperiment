@@ -65,7 +65,6 @@ float PerlinNoise2D(float2 uv, int cellNums, StructuredBuffer<float3> points)
 
     float2 smoothLocalUV = smoothstep(0.0, 1.0, localUV);
     float result = lerp(lerp(a, b, smoothLocalUV.x), lerp(c, d, smoothLocalUV.x), smoothLocalUV.y);
-    result = Remap(-0.2, 1, 0, 1, result);
     return result;
 }
 
@@ -157,7 +156,7 @@ float CalculateNoise(float3 uvw, NoiseSetting setting, StructuredBuffer<float3> 
         result = Remap(setting.minValue, setting.maxValue, 0, 1, result);
         return setting.isInvert ? 1 - result : result;
     }
-    // perlin 噪声
+    // perlin 噪声: TODO:无论是预览还是输出，都需要获取最小值以及最大值来对结果进行限制(数据映射)
     else if (setting.noiseType == 2) 
     {
         float result = _IsTowDimension ? 

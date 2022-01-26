@@ -19,7 +19,7 @@ namespace Custom.Noise
     public enum SaveType { PNG, JPG, TGA, }
     public enum Resolution3D { _32x32 = 32, _64x64 = 64, _128x128 = 128, _256x256 = 256, }
 
-    public enum NoiseType { Normal, Worley, Perlin, }
+    public enum NoiseType { Hashing, Worley, Perlin, }
 
     public struct SingleLayerNoiseSetting
     {

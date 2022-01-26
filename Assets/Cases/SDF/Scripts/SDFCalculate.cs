@@ -11,6 +11,7 @@ public class SDFCalculate : MonoBehaviour
     [LabelText("计算着色器")]
     public ComputeShader CS;
 
+    #region CUP 黑白有向距离生成
     // [Button("CPU计算")]
     public void CPUExcute()
     {
@@ -62,7 +63,11 @@ public class SDFCalculate : MonoBehaviour
         resultBuffer.Release();
         return minValue;
     }
-    [Button("GPU计算")]
+    #endregion
+
+
+    #region GUP 黑白有向距离生成
+    [Button("GPU计算(黑白图)")]
     public void GPUExcute()
     {
         if (tex2D == null || CS == null) return;
@@ -74,4 +79,7 @@ public class SDFCalculate : MonoBehaviour
         CS.Dispatch(1, originRT.width / 32, originRT.height / 32, 1);
         GetComponent<MeshRenderer>().sharedMaterial.mainTexture = resultRT;
     }
+    #endregion
+    
+    
 }

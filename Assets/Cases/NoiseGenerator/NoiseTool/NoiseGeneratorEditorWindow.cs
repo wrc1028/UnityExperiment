@@ -108,10 +108,10 @@ namespace Custom.Noise
             GUILayout.BeginArea(new Rect(10, 10, 256, 460));
             GUILayout.BeginHorizontal();
             channel = (Channel)EditorGUILayout.EnumPopup("显示通道", channel);
-            if (GUILayout.Button(new GUIContent("保存预览", "保存预览结果到当前通道"), GUILayout.Width(60)))
-            {
-                
-            }
+            // if (GUILayout.Button(new GUIContent("保存预览", "保存预览结果到当前通道"), GUILayout.Width(60)))
+            // {
+            //     
+            // }
             GUILayout.EndHorizontal();
             GUILayout.Label(previewRT, GUILayout.Width(256), GUILayout.Height(256));
             GUILayout.Space(5);
