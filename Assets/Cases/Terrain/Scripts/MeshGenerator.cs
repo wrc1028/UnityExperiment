@@ -27,13 +27,14 @@ namespace Custom.Terrain
             vertexes = GenerateVertexes(new Vector2(xLength, yLength), new Vector2Int(xSubdivision, ySubdivision));
             triangles = GenerateTriangles(new Vector2Int(xSubdivision, ySubdivision));
             uv = GenerateUV(new Vector2Int(xSubdivision, ySubdivision));
-            // normals = GenerateNormals(new Vector2Int(xSubdivision, ySubdivision));
+            normals = GenerateNormals(new Vector2Int(xSubdivision, ySubdivision));
             // 重新计算Vertex、Normal
             CalculateVertexes(ref vertexes, perlinNoiseTex, 1);
-            // CalculateNormals(ref normals, perlinNoiseTex, 1);
+            CalculateNormals(ref normals, perlinNoiseTex, 1);
             Mesh mesh = new Mesh();
             mesh.vertices = vertexes;
             mesh.triangles = triangles;
+            mesh.normals = normals;
             mesh.RecalculateNormals();
             mesh.uv = uv;
             GetComponent<MeshFilter>().mesh = mesh;

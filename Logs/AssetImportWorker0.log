@@ -1,0 +1,409 @@
+Using pre-set license
+Built from '2020.3/china_unity/release' branch; Version is '2020.3.12f1c1 (5887f62ce680) revision 5801974'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10 Home; OS build 19043.1466; Version 2009; 64bit' Language: 'zh' Physical Memory: 65310 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.3.12f1c1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+D:/UnityProject/UnityExperiment
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+65422
+Successfully changed project path to: D:/UnityProject/UnityExperiment
+D:/UnityProject/UnityExperiment
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 43.54 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.12f1c1 (5887f62ce680)
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/UnityProject/UnityExperiment/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 2060 (ID=0x1f08)
+    Vendor:   
+    VRAM:     5980 MB
+    Driver:   27.21.14.6663
+Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56872
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001433 seconds.
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 42.49 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.683 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.003890 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 43.55 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.307 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
+Refreshing native plugins compatible for Editor in 0.60 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 2940 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 129.2 MB.
+System memory in use after: 129.4 MB.
+
+Unloading 32 unused Assets to reduce memory usage. Loaded Objects now: 3428.
+Total: 19.582600 ms (FindLiveObjects: 0.304000 ms CreateObjectMapping: 0.144900 ms MarkObjects: 19.048500 ms  DeleteObjects: 0.083600 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Import Request.
+  path: Assets/Scenes/SDF.unity
+  artifactKey: Guid(d0fddae651fdca64281f956d43ebd63c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/SDF.unity using Guid(d0fddae651fdca64281f956d43ebd63c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6b349f9caceb6a399d5259dbc26214b1') in 0.010142 seconds 
+  Import took 0.014089 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 317.009487 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6cea341cf70aff2a5d9d7068314e9641') in 0.037629 seconds 
+  Import took 0.041903 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 13.929830 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cab7c3182b977343896aacd5f2ad36bf') in 0.007118 seconds 
+  Import took 0.011125 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001341 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cab7c3182b977343896aacd5f2ad36bf') in 0.006639 seconds 
+  Import took 0.010348 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 59.243647 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5a15e19e2243121f9352e45ea033d1df') in 0.004995 seconds 
+  Import took 0.008951 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.006927 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5a15e19e2243121f9352e45ea033d1df') in 0.004934 seconds 
+  Import took 0.008856 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 100.054938 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'df3040eb2d7b9cd0ed31a309ccb1ecd3') in 0.004902 seconds 
+  Import took 0.008852 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001404 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'df3040eb2d7b9cd0ed31a309ccb1ecd3') in 0.005105 seconds 
+  Import took 0.008900 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 184.586318 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7467c956271422d7c7d0c01cd5c0aa65') in 0.005428 seconds 
+  Import took 0.009428 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001075 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M.png
+  artifactKey: Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M.png using Guid(8dcf0cd68a7eced4ab5519d0280a62ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7467c956271422d7c7d0c01cd5c0aa65') in 0.004708 seconds 
+  Import took 0.008995 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 125.874986 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M_1.png
+  artifactKey: Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M_1.png using Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '12132a56a7176559ad645b72e144e662') in 0.005273 seconds 
+  Import took 0.009387 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.011543 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M_1.png
+  artifactKey: Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M_1.png using Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '12132a56a7176559ad645b72e144e662') in 0.004459 seconds 
+  Import took 0.008524 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 13.030288 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M_1.png
+  artifactKey: Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M_1.png using Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e98c6b8048e7b5595b7e63c0ca93942f') in 0.004543 seconds 
+  Import took 0.008400 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.003443 seconds.
+  path: Assets/Cases/SDF/Sdf_3_M_1.png
+  artifactKey: Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Sdf_3_M_1.png using Guid(18c18df80de7773459da387c046e6ac8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e98c6b8048e7b5595b7e63c0ca93942f') in 0.004272 seconds 
+  Import took 0.008143 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 856.171154 seconds.
+  path: Assets/Cases/SDF/Toon
+  artifactKey: Guid(08bb9be5542ddac429caa8784a113ef4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon using Guid(08bb9be5542ddac429caa8784a113ef4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a00e1ab773175736ca91144a8f5ed08f') in 0.001847 seconds 
+  Import took 0.006196 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 7.341829 seconds.
+  path: Assets/Cases/SDF/Toon/a.png
+  artifactKey: Guid(0d017ce8c8bce5b41ac25398122f4e87) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/a.png using Guid(0d017ce8c8bce5b41ac25398122f4e87) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f852a546e684291fa0c465ec4beb92dd') in 0.012142 seconds 
+  Import took 0.016040 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000144 seconds.
+  path: Assets/Cases/SDF/Toon/h.png
+  artifactKey: Guid(086548cf5bec0ee4095270187ce74e26) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/h.png using Guid(086548cf5bec0ee4095270187ce74e26) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0935b67c3cc9df14d61b862ffe32853a') in 0.005727 seconds 
+  Import took 0.008977 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000164 seconds.
+  path: Assets/Cases/SDF/Toon/c.png
+  artifactKey: Guid(79479047c0409b94caa59204acfbd405) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/c.png using Guid(79479047c0409b94caa59204acfbd405) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '155947a59d9b9689e608510af74a17b1') in 0.004752 seconds 
+  Import took 0.007816 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000130 seconds.
+  path: Assets/Cases/SDF/Toon/e.png
+  artifactKey: Guid(b2835b1cb428b4f4a89635db620030cb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/e.png using Guid(b2835b1cb428b4f4a89635db620030cb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3d31c192328266d49340f810e24e5300') in 0.004951 seconds 
+  Import took 0.008113 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000160 seconds.
+  path: Assets/Cases/SDF/Toon/g.png
+  artifactKey: Guid(f0ea4d00426621f4c9c6cad0e134ba8a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/g.png using Guid(f0ea4d00426621f4c9c6cad0e134ba8a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'be618bb2c566fd4bca2a8ec8ada0204b') in 0.004713 seconds 
+  Import took 0.007772 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000126 seconds.
+  path: Assets/Cases/SDF/Toon/b.png
+  artifactKey: Guid(41c20f4399038384b8484f60687e035c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/b.png using Guid(41c20f4399038384b8484f60687e035c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a7a63299916725e5190b9f01c97150b9') in 0.004688 seconds 
+  Import took 0.007954 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000162 seconds.
+  path: Assets/Cases/SDF/Toon/f.png
+  artifactKey: Guid(76de999c4eccb2244aad394ea89953c9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/f.png using Guid(76de999c4eccb2244aad394ea89953c9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1d1f72aba5d77e726bd74f23bf402b26') in 0.005204 seconds 
+  Import took 0.008804 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000139 seconds.
+  path: Assets/Cases/SDF/Toon/d.png
+  artifactKey: Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/d.png using Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '59328e2d65eeed875a83bed22447fec8') in 0.005780 seconds 
+  Import took 0.009341 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 25.084251 seconds.
+  path: Assets/Cases/SDF/Toon/ToonFace.shadergraph
+  artifactKey: Guid(7569e220d9f88fa4fa714128c2b7c8f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/ToonFace.shadergraph using Guid(7569e220d9f88fa4fa714128c2b7c8f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '51fe0a265f68e3219ba37a8afb73a570') in 0.005832 seconds 
+  Import took 0.009905 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000710 seconds.
+  path: Assets/Cases/SDF/Toon/ToonFace.shadergraph
+  artifactKey: Guid(7569e220d9f88fa4fa714128c2b7c8f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/ToonFace.shadergraph using Guid(7569e220d9f88fa4fa714128c2b7c8f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '51fe0a265f68e3219ba37a8afb73a570') in 0.002254 seconds 
+  Import took 0.005620 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 29.018497 seconds.
+  path: Assets/Cases/SDF/Toon/ToonShader.shader
+  artifactKey: Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/ToonShader.shader using Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b3b0ba3a38928250c52058f5e44c08f8') in 0.003550 seconds 
+  Import took 0.007759 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 166.945338 seconds.
+  path: Assets/Cases/SDF/Toon/ToonShader.shader
+  artifactKey: Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/ToonShader.shader using Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '796de9786bb139f6315d8dba571820d8') in 0.002276 seconds 
+  Import took 0.006469 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 20.145340 seconds.
+  path: Assets/Cases/SDF/Toon/ToonShader.shader
+  artifactKey: Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/ToonShader.shader using Guid(7c3a0aa5212b95740b183468667d5acc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9c14bbe7a33f1a7ce055e2574e7c9eda') in 0.002066 seconds 
+  Import took 0.005696 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.632893 seconds.
+  path: Assets/Cases/SDF/Toon/Unlit_ToonShader.mat
+  artifactKey: Guid(0bed00ce694cac34db38939058a83dd1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/Unlit_ToonShader.mat using Guid(0bed00ce694cac34db38939058a83dd1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ee676a8cc50501233008641c460436fc') in 0.044640 seconds 
+  Import took 0.048656 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 197.645332 seconds.
+  path: Assets/Cases/SDF/Toon/d.png
+  artifactKey: Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/d.png using Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0507f0e50faab7b44376b0a2c56f2243') in 0.006637 seconds 
+  Import took 0.011032 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.005029 seconds.
+  path: Assets/Cases/SDF/Toon/d.png
+  artifactKey: Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon/d.png using Guid(2c88e88cf1ba9e2418a0b69c8f5aebd7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0507f0e50faab7b44376b0a2c56f2243') in 0.006668 seconds 
+  Import took 0.011150 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 111.227450 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7e94810c82b6200cf82cdbe2bbe8e9d1') in 0.004435 seconds 
+  Import took 0.008485 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 6.920193 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '468bf64242ff0ac05d5839fd2933526e') in 0.005698 seconds 
+  Import took 0.009989 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.006241 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '468bf64242ff0ac05d5839fd2933526e') in 0.005638 seconds 
+  Import took 0.009605 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 299.359936 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b5fa8bdc33b78b0c41ce2d55e67feb57') in 0.007590 seconds 
+  Import took 0.012117 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.002086 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b5fa8bdc33b78b0c41ce2d55e67feb57') in 0.007214 seconds 
+  Import took 0.011037 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 13.970417 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ac8dfd85bcb9a6954b37ec31b005b5cf') in 0.004575 seconds 
+  Import took 0.008652 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.953975 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '356cdcda353e39b52ec725349d79d87b') in 0.004445 seconds 
+  Import took 0.008405 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.003272 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '356cdcda353e39b52ec725349d79d87b') in 0.004984 seconds 
+  Import took 0.008980 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.186585 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f9320ca07fefca1bad8f50561404dc7e') in 0.004579 seconds 
+  Import took 0.008590 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.006335 seconds.
+  path: Assets/Cases/SDF/Toon.png
+  artifactKey: Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SDF/Toon.png using Guid(41b59677b38ecaa4e909294b6bb163b9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f9320ca07fefca1bad8f50561404dc7e') in 0.004305 seconds 
+  Import took 0.008287 seconds .
+
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file

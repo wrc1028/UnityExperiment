@@ -68,6 +68,41 @@ uint CalculateMinDst(int2 srcPos, int2 dstPos, int2 pixelID, int2 offset, int re
     }
     return minDst;
 }
+// float4(greaterThanValue, minDst2, lessThanValue, minDst2)
+// 返回不同值的像素点坐标
+float4 CalculateMinDstPoint(int2 srcPos, int2 dstPos, int2 pixelID, int2 offset, int resolution)
+{
+    // 整条边界都超出边界
+    if (dot(srcPos, 1 - offset) < 0 || dot(srcPos, 1 - offset) > resolution - 1) return MAXDST2;
+    int2 src = srcPos + offset;
+    int dst = dot(dstPos, offset);
+
+    float4 result = float4(1, 1.#INF, 0, 1.#INF);
+    float originValue = _OriginTexture[pixelID];
+
+    while (dot(src, offset) < dst)
+    {
+        float targetValue = _OriginTexture[src];
+        bool isDifferentValue = targetValue != originValue && originValue != 1 && originValue != 0; //isMax ? targetValue - originValue > 0 : targetValue - originValue < 0;
+        bool isInMappingRange = dot(src, offset) >= 0 && dot(src, offset) < resolution;
+        if (isDifferentValue && isInMappingRange)
+        {
+            // 遍历值大于原点值, 并且要小于存储值
+            if (targetValue > originValue && targetValue <= result.x)
+            {
+                result.x = targetValue;
+                result.y = min(result.y, dot(src - pixelID, src - pixelID));
+            }
+            else if (targetValue < originValue && targetValue >= result.z)
+            {
+                result.z = targetValue;
+                result.w = min(result.w, dot(src - pixelID, src - pixelID));
+            }
+        }
+        src += offset;
+    }
+    return result;
+}
 
 float ExpandCalculate(int2 pixelID, uint maxSize, int resolution)
 {
@@ -90,8 +125,44 @@ float ExpandCalculate(int2 pixelID, uint maxSize, int resolution)
         extraExpand = ceil(sqrt(minDst2)) - expand;
         expand ++;
     }
-    float result = sqrt(minDst2) / (resolution * 0.2);
+    float result = sqrt(minDst2) / (resolution * 0.15);
     return result;
+}
+
+float ExpandCalculateLerp(int2 pixelID, int resolution)
+{
+    int2 offset = int2(1, -1);
+    uint expand = 1;
+    uint extraExpand01 = MAXDST2;
+    uint extraExpand02 = MAXDST2;
+    uint minDst2 = MAXDST2;
+    float currentValue = _OriginTexture[pixelID];
+    // float4(greaterThanValue, minDst2, lessThanValue, minDst2)
+    float4 result = float4(1, 1.#INF, 0, 1.#INF);
+    
+    while(extraExpand01 > 0 || extraExpand02 > 0) 
+    {
+        int2 lu = pixelID + offset.yx * expand;
+        int2 ru = pixelID + offset.xx * expand;
+        int2 ld = pixelID + offset.yy * expand;
+        int2 rd = pixelID + offset.xy * expand;
+        float4 up = CalculateMinDstPoint(lu, ru, pixelID, int2(1, 0), resolution);
+        float4 down = CalculateMinDstPoint(ld, rd, pixelID, int2(1, 0), resolution);
+        float4 left = CalculateMinDstPoint(ld, lu, pixelID, int2(0, 1), resolution);
+        float4 right = CalculateMinDstPoint(rd, ru, pixelID, int2(0, 1), resolution);
+        // 获得最小值
+        result.x = min(result.x, min(min(up.x, down.x), min(left.x, right.x)));
+        result.y = min(result.y, min(min(up.y, down.y), min(left.y, right.y)));
+        result.z = max(result.z, max(max(up.z, down.z), max(left.z, right.z)));
+        result.w = min(result.w, min(min(up.w, down.w), min(left.w, right.w)));
+
+        extraExpand01 = ceil(sqrt(result.y)) - expand;
+        extraExpand02 = ceil(sqrt(result.w)) - expand;
+
+        expand ++;
+    }
+    float lerpResult = lerp(result.x, result.z, result.y / (result.y + result.w));
+    return (lerpResult + _OriginTexture[pixelID]) * 0.5;
 }
 
 [numthreads(SIZEX, SIZEY, 1)]
@@ -102,7 +173,8 @@ void SDFRegion (uint3 id : SV_DispatchThreadID)
     // 在指定的方盒内进行遍历，超出方盒边长的距离视为最大值
     // Result[id.xy] = CalculateDstInBox(id.xy, width * 2, width);
     // 从一个点向四周辐射，逐渐扩大包围盒，直到ceil(最短距离)与扩展边长相等
-    Result[id.xy] = ExpandCalculate(id.xy, width * 2, width);
+    // Result[id.xy] = saturate(ExpandCalculate(id.xy, width * 2, width));
+    Result[id.xy] = saturate(ExpandCalculateLerp(id.xy, width));
 }
 
 // 多段灰阶求平滑过度
@@ -112,5 +184,5 @@ void SDFMultiGray (uint3 id : SV_DispatchThreadID)
     uint width, height;
     _OriginTexture.GetDimensions(width, height);
     // float4(dstMinValue, minDst, dstMaxValue, minDst)
-    
+
 }
