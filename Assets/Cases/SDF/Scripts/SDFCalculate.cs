@@ -74,9 +74,11 @@ public class SDFCalculate : MonoBehaviour
         RenderTexture originRT = CreateRenderTexture(tex2D.width, tex2D.height, RenderTextureFormat.ARGB32);
         RenderTexture resultRT = CreateRenderTexture(tex2D.width, tex2D.height, RenderTextureFormat.ARGB32);
         Graphics.Blit(tex2D, originRT);
-        CS.SetTexture(1, "_OriginTexture", originRT);
-        CS.SetTexture(1, "Result", resultRT);
-        CS.Dispatch(1, originRT.width / 32, originRT.height / 32, 1);
+        CS.SetTexture(0, "_MulitGrayTexture", originRT);
+        CS.SetTexture(0, "SDFResult", resultRT);
+        int threadGroupsX = Mathf.CeilToInt(originRT.width / 32 + 0.001f);
+        int threadGroupsY = Mathf.CeilToInt(originRT.height / 32 + 0.001f);
+        CS.Dispatch(0, threadGroupsX, threadGroupsY, 1);
         GetComponent<MeshRenderer>().sharedMaterial.mainTexture = resultRT;
     }
     #endregion

@@ -1,0 +1,87 @@
+#pragma kernel MulitGray
+
+#define SIZEX 32
+#define SIZEY 32
+#define BIAS 0.1
+#define MAXDST2 1024 * 1024 * 2
+
+RWTexture2D<float> SDFResult;
+Texture2D<float> _MulitGrayTexture;
+
+// 整个遍历值都在范围之外:返回false
+// out:
+int LimitLineRange(int vaule, int resolution)
+{
+    if (vaule < 0) return 0;
+    else if (vaule > resolution - 1) return resolution - 1;
+    else return vaule;
+}
+
+// 设定值为0、1为边界，边界不参与计算最短距离，当充当值进行计算
+// 返回值: float4(greaterThanValue, minDst2, lessThanValue, minDst2)
+// offset: x为1表示在X轴正方向遍历, 为-1为负方向遍历; y同理
+void CalculateMinDstInLine(int2 srcPos, int2 dstPos, int2 pixelID, float pixelValue, int2 offset, int resolution, inout float4 result)
+{
+    // 超出范围的值不参与运算
+    int limitLine = dot(srcPos, 1 - abs(offset));
+    if (limitLine < 0 || limitLine > resolution - 1) return;
+
+    int dst = LimitLineRange(dot(dstPos, offset), resolution);
+    while(dot(srcPos, offset) <= dst)
+    {
+        srcPos += offset;
+        float targetValue = _MulitGrayTexture[srcPos];
+        if (targetValue == pixelValue) continue;
+        // 介于当前遍历的像素和记录的值
+        else if (targetValue > pixelValue && targetValue <= result.x)
+        {
+            result.x = targetValue;
+            result.y = min(result.y, dot(srcPos - pixelID, srcPos - pixelID));
+        }
+        else if (targetValue < pixelValue && targetValue >= result.z)
+        {
+            result.z = targetValue;
+            result.w = min(result.w, dot(srcPos - pixelID, srcPos - pixelID));
+        }
+    }
+}
+
+float ExpandCalculateLerp(int2 pixelID, int resolution)
+{
+    float pixelValue = _MulitGrayTexture[pixelID];
+    // 如果是边界，直接返回0
+    if (pixelValue == 0 || pixelValue == 1) return 0;
+    // 值范围限制，如果超出范围, 则继续往下遍历
+    int3 offset = int3(1, -1, 0);
+    int expand = 1;
+    int limitExpand01 = MAXDST2;
+    int limitExpand02 = MAXDST2;
+    float4 result = float4(1, 1.#INF, 0, 1.#INF);
+    while ((limitExpand01 > 0 || limitExpand02 > 0) && expand < 512)
+    {
+        int2 lu = pixelID + offset.yx * expand;
+        int2 ru = pixelID + offset.xx * expand;
+        int2 ld = pixelID + offset.yy * expand;
+        int2 rd = pixelID + offset.xy * expand;
+        CalculateMinDstInLine(lu, ru, pixelID, pixelValue, offset.xz, resolution, result);
+        CalculateMinDstInLine(ru, rd, pixelID, pixelValue, offset.zy, resolution, result);
+        CalculateMinDstInLine(rd, ld, pixelID, pixelValue, offset.yz, resolution, result);
+        CalculateMinDstInLine(ld, lu, pixelID, pixelValue, offset.zx, resolution, result);
+        
+        limitExpand01 = result.y - expand * expand;
+        limitExpand02 = result.w - expand * expand;
+        expand ++;
+    }
+    result.y = sqrt(result.y);
+    result.w = sqrt(result.w);
+    float lerpResult = lerp(result.x, result.z, result.y / (result.y + result.w));
+    return (lerpResult + pixelValue) * 0.5;
+}
+
+[numthreads(SIZEX, SIZEY, 1)]
+void MulitGray (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _MulitGrayTexture.GetDimensions(width, height);
+    SDFResult[id.xy] = ExpandCalculateLerp(id.xy, width);
+}

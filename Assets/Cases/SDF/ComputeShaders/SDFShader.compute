@@ -5,7 +5,7 @@
 #define SIZEX 32
 #define SIZEY 32
 #define MAXDST 30
-#define MAXDST2 100000000
+#define MAXDST2 1000000000
 
 int2 _PixelID;
 Texture2D<float> _OriginTexture;
@@ -57,10 +57,10 @@ uint CalculateMinDst(int2 srcPos, int2 dstPos, int2 pixelID, int2 offset, int re
 {
     // 整条边界都超出边界
     if (dot(srcPos, 1 - offset) < 0 || dot(srcPos, 1 - offset) > resolution - 1) return MAXDST2;
-    int2 src = srcPos + offset;
+    int2 src = srcPos;
     int dst = dot(dstPos, offset);
     uint minDst = MAXDST2;
-    while (dot(src, offset) < dst)
+    while (dot(src, offset) <= dst)
     {
         if (_OriginTexture[src] != _OriginTexture[pixelID] && dot(src, offset) >= 0 && dot(src, offset) < resolution)
             minDst = min(minDst, dot(src - pixelID, src - pixelID));
@@ -74,13 +74,13 @@ float4 CalculateMinDstPoint(int2 srcPos, int2 dstPos, int2 pixelID, int2 offset,
 {
     // 整条边界都超出边界
     if (dot(srcPos, 1 - offset) < 0 || dot(srcPos, 1 - offset) > resolution - 1) return MAXDST2;
-    int2 src = srcPos + offset;
+    int2 src = srcPos;
     int dst = dot(dstPos, offset);
 
     float4 result = float4(1, 1.#INF, 0, 1.#INF);
     float originValue = _OriginTexture[pixelID];
 
-    while (dot(src, offset) < dst)
+    while (dot(src, offset) <= dst)
     {
         float targetValue = _OriginTexture[src];
         bool isDifferentValue = targetValue != originValue && originValue != 1 && originValue != 0; //isMax ? targetValue - originValue > 0 : targetValue - originValue < 0;
@@ -135,7 +135,6 @@ float ExpandCalculateLerp(int2 pixelID, int resolution)
     uint expand = 1;
     uint extraExpand01 = MAXDST2;
     uint extraExpand02 = MAXDST2;
-    uint minDst2 = MAXDST2;
     float currentValue = _OriginTexture[pixelID];
     // float4(greaterThanValue, minDst2, lessThanValue, minDst2)
     float4 result = float4(1, 1.#INF, 0, 1.#INF);
@@ -161,7 +160,10 @@ float ExpandCalculateLerp(int2 pixelID, int resolution)
 
         expand ++;
     }
-    float lerpResult = lerp(result.x, result.z, result.y / (result.y + result.w));
+    result.y = sqrt(result.y);
+    result.w = sqrt(result.w);
+    float lerpValue = result.y / (result.y + result.w);
+    float lerpResult = lerp(result.x, result.z, lerpValue);
     return (lerpResult + _OriginTexture[pixelID]) * 0.5;
 }
 
