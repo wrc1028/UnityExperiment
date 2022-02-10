@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 207663889}
   - component: {fileID: 207663888}
   m_Layer: 0
-  m_Name: Quad (2)
+  m_Name: Quad_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -316,7 +316,7 @@ GameObject:
   - component: {fileID: 1547642785}
   - component: {fileID: 1547642784}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: Quad_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,7 +9,6 @@ RWTexture2D<float> SDFResult;
 Texture2D<float> _MulitGrayTexture;
 
 // 整个遍历值都在范围之外:返回false
-// out:
 int LimitLineRange(int vaule, int resolution)
 {
     if (vaule < 0) return 0;
@@ -25,8 +24,11 @@ void CalculateMinDstInLine(int2 srcPos, int2 dstPos, int2 pixelID, float pixelVa
     // 超出范围的值不参与运算
     int limitLine = dot(srcPos, 1 - abs(offset));
     if (limitLine < 0 || limitLine > resolution - 1) return;
-
+    // 限制循环范围
     int dst = LimitLineRange(dot(dstPos, offset), resolution);
+    srcPos.x = LimitLineRange(srcPos.x, resolution);
+    srcPos.y = LimitLineRange(srcPos.y, resolution);
+    
     while(dot(srcPos, offset) <= dst)
     {
         srcPos += offset;
