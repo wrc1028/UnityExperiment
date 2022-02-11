@@ -1,4 +1,5 @@
 #pragma kernel MulitGray
+#pragma kernel BlackWhite
 
 #define SIZEX 32
 #define SIZEY 32
@@ -6,8 +7,17 @@
 #define MAXDST2 1024 * 1024 * 2
 
 RWTexture2D<float> SDFResult;
-Texture2D<float> _MulitGrayTexture;
+Texture2D<float> _OriginTexture;
 
+bool _IsInvert;
+bool _IsAssociateTex;
+float2 _MapValue;
+
+float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
+{
+    float weight = (value - oldMin) / (oldMax - oldMin);
+    return weight * (newMax - newMin) + newMin;
+}
 // 整个遍历值都在范围之外:返回false
 int LimitLineRange(int vaule, int resolution)
 {
@@ -32,7 +42,7 @@ void CalculateMinDstInLine(int2 srcPos, int2 dstPos, int2 pixelID, float pixelVa
     while(dot(srcPos, offset) <= dst)
     {
         srcPos += offset;
-        float targetValue = _MulitGrayTexture[srcPos];
+        float targetValue = _OriginTexture[srcPos];
         if (targetValue == pixelValue) continue;
         // 介于当前遍历的像素和记录的值
         else if (targetValue > pixelValue && targetValue <= result.x)
@@ -50,7 +60,7 @@ void CalculateMinDstInLine(int2 srcPos, int2 dstPos, int2 pixelID, float pixelVa
 
 float ExpandCalculateLerp(int2 pixelID, int resolution)
 {
-    float pixelValue = _MulitGrayTexture[pixelID];
+    float pixelValue = _OriginTexture[pixelID];
     // 如果是边界，直接返回0
     if (pixelValue == 0 || pixelValue == 1) return 0;
     // 值范围限制，如果超出范围, 则继续往下遍历
@@ -77,13 +87,74 @@ float ExpandCalculateLerp(int2 pixelID, int resolution)
     result.y = sqrt(result.y);
     result.w = sqrt(result.w);
     float lerpResult = lerp(result.x, result.z, result.y / (result.y + result.w));
-    return (lerpResult + pixelValue) * 0.5;
+    return _IsAssociateTex ? (lerpResult + pixelValue) * 0.5 : lerpResult;
 }
 
 [numthreads(SIZEX, SIZEY, 1)]
 void MulitGray (uint3 id : SV_DispatchThreadID)
 {
     uint width, height;
-    _MulitGrayTexture.GetDimensions(width, height);
-    SDFResult[id.xy] = ExpandCalculateLerp(id.xy, width);
+    _OriginTexture.GetDimensions(width, height);
+    float result = ExpandCalculateLerp(id.xy, width);
+    result = _IsInvert ? 1 - result : result;
+    SDFResult[id.xy] = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
+}
+
+void CalculateMinDst(int2 srcPos, int2 dstPos, int2 pixelID, float pixelValue, int2 offset, int resolution, inout uint result2)
+{
+    // 超出范围的值不参与运算
+    int limitLine = dot(srcPos, 1 - abs(offset));
+    if (limitLine < 0 || limitLine > resolution - 1) return;
+    // 限制循环范围
+    int dst = LimitLineRange(dot(dstPos, offset), resolution);
+    srcPos.x = LimitLineRange(srcPos.x, resolution);
+    srcPos.y = LimitLineRange(srcPos.y, resolution);
+
+    while (dot(srcPos, offset) <= dst)
+    {
+        srcPos += offset;
+        float targetValue = step(0.5, _OriginTexture[srcPos]);
+        if (targetValue == pixelValue) continue;
+        result2 = min(result2, dot(srcPos - pixelID, srcPos - pixelID));
+    }
+}
+
+float ExpandCalculate(int2 pixelID, int resolution)
+{
+    float pixelValue = step(0.5, _OriginTexture[pixelID]);
+    // 值范围限制，如果超出范围, 则继续往下遍历
+    int3 offset = int3(1, -1, 0);
+    int expand = 1;
+    int limitExpand = MAXDST2;
+    uint result2 = MAXDST2;
+    while (limitExpand > 0 && expand < 512)
+    {
+        int2 lu = pixelID + offset.yx * expand;
+        int2 ru = pixelID + offset.xx * expand;
+        int2 ld = pixelID + offset.yy * expand;
+        int2 rd = pixelID + offset.xy * expand;
+        CalculateMinDst(lu, ru, pixelID, pixelValue, offset.xz, resolution, result2);
+        CalculateMinDst(ru, rd, pixelID, pixelValue, offset.zy, resolution, result2);
+        CalculateMinDst(rd, ld, pixelID, pixelValue, offset.yz, resolution, result2);
+        CalculateMinDst(ld, lu, pixelID, pixelValue, offset.zx, resolution, result2);
+        
+        limitExpand = result2 - expand * expand;
+        expand ++;
+    }
+    // float minMapValue = saturate(0.5 - _MapValue.x) / (resolution * 0.01) + 0.001;
+    // float maxMapValue = saturate(_MapValue.y - 0.5) / (resolution * 0.01) + 0.001;
+    float division = 1.0 / (resolution * 0.4);
+    float minDst = sqrt(result2);
+    float result = pixelValue == 1 ? 1 + (minDst - 1) * division: 1 - minDst * division;
+    return _IsAssociateTex ? result * 0.5 : minDst;
+}
+
+[numthreads(SIZEX, SIZEY, 1)]
+void BlackWhite (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _OriginTexture.GetDimensions(width, height);
+    float result = ExpandCalculate(id.xy, width);
+    result = _IsInvert ? 1 - result : result;
+    SDFResult[id.xy] = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
 }
