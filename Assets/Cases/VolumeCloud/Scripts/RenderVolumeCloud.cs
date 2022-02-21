@@ -75,9 +75,11 @@ public class RenderVolumeCloud : MonoBehaviour
     // 
     [TitleGroup("透光率")]
     [LabelText("取样点到光源间的光吸收系数")]
+    [Range(0.001f, 0.5f)]
     public float lightAbsorptionTowardSun;
     [TitleGroup("透光率")]
     [LabelText("云层间的光吸收系数")]
+    [Range(0.001f, 0.5f)]
     public float lightAbsorptionTowardCloud;
     [TitleGroup("透光率")]
     [LabelText("Phase数值")]

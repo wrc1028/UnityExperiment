@@ -3,7 +3,7 @@
 #pragma kernel OutputTexture2D
 #pragma kernel CombineChannel
 #pragma kernel OutputResult
-
+// 权重混合有BUG
 bool _IsTowDimension;
 float _SamplerDepth;
 struct NoiseSetting
@@ -36,7 +36,7 @@ RWStructuredBuffer<float> SingleLayerResult;
 float Remap(float oldMin, float oldMax, float newMin, float newMax, float value)
 {
     float weight = (value - oldMin) / (oldMax - oldMin);
-    return weight * (newMax - newMin) + newMin;
+    return saturate(weight * (newMax - newMin) + newMin);
 }
 // Normal noise
 float Hash33(float3 p)

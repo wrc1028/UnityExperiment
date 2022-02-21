@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &200848852
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -273,7 +273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &638773669
 Transform:
   m_ObjectHideFlags: 0
@@ -461,7 +461,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &738158477
 Transform:
   m_ObjectHideFlags: 0
@@ -648,13 +648,13 @@ MonoBehaviour:
   densityThreshold: -0.2
   densityMultiplier: 7.1
   detailNoiseTexture: {fileID: 11700000, guid: 125e50ba4ae67fe4399a5eb06c974e9b, type: 2}
-  detailWeight: 10.51
+  detailWeight: 6.63
   detailNoiseWeight: {x: 1, y: 0.5, z: 0.25, w: 0.125}
   detailNoiseScale: 5
   detailNoiseOffset: {x: 3.6, y: 0, z: 0, w: 0.01}
   detailMoveDirAndSpeed: {x: 1, y: 0, z: 0, w: 0.1}
-  lightAbsorptionTowardSun: 0.04
-  lightAbsorptionTowardCloud: 0.28
+  lightAbsorptionTowardSun: 0.031
+  lightAbsorptionTowardCloud: 0.209
   darknessThreshold: {x: 0.11, y: 0.92, z: 0.36, w: 0.02}
 --- !u!1 &1149730338
 GameObject:
@@ -674,7 +674,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1149730339
 Transform:
   m_ObjectHideFlags: 0
@@ -818,7 +818,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1768281924
 Transform:
   m_ObjectHideFlags: 0
@@ -935,7 +935,7 @@ Transform:
   m_GameObject: {fileID: 1842661323}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 300, z: 0}
-  m_LocalScale: {x: 1252.2557, y: 200, z: 1132.0533}
+  m_LocalScale: {x: 1000, y: 200, z: 1000}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1

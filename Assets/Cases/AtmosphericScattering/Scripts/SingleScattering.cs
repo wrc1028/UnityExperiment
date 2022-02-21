@@ -20,6 +20,7 @@ public class SingleScattering : MonoBehaviour
     public Vector3 waveLength = new Vector3(700, 530, 440);
     [TitleGroup("基础参数")]
     [LabelText("散射强度强度")]
+    [Range(0.001f, 0.5f)]
     public float scatteringStrength = 1;
 
     [TitleGroup("行星数据")]
@@ -27,12 +28,15 @@ public class SingleScattering : MonoBehaviour
     public Transform earthTransform;
     [TitleGroup("行星数据")]
     [LabelText("行星半径")]
+    [Min(0.001f)]
     public float earthRadius = 42.8f;
     [TitleGroup("行星数据")]
     [LabelText("大气层高度")]
+    [Min(0.001f)]
     public float atmosphereHeight = 10;
     [TitleGroup("行星数据")]
     [LabelText("大气层密度衰减控制")]
+    [Min(0.001f)]
     public float atmosphericDensityCtrl = 1;
 
     private void Start()

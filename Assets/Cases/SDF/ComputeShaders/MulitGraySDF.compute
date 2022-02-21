@@ -96,8 +96,8 @@ void MulitGray (uint3 id : SV_DispatchThreadID)
     uint width, height;
     _OriginTexture.GetDimensions(width, height);
     float result = ExpandCalculateLerp(id.xy, width);
-    result = _IsInvert ? 1 - result : result;
-    SDFResult[id.xy] = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
+    result = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
+    SDFResult[id.xy] = _IsInvert ? 1 - result : result;
 }
 
 void CalculateMinDst(int2 srcPos, int2 dstPos, int2 pixelID, float pixelValue, int2 offset, int resolution, inout uint result2)
@@ -141,12 +141,10 @@ float ExpandCalculate(int2 pixelID, int resolution)
         limitExpand = result2 - expand * expand;
         expand ++;
     }
-    // float minMapValue = saturate(0.5 - _MapValue.x) / (resolution * 0.01) + 0.001;
-    // float maxMapValue = saturate(_MapValue.y - 0.5) / (resolution * 0.01) + 0.001;
     float division = 1.0 / (resolution * 0.4);
     float minDst = sqrt(result2);
     float result = pixelValue == 1 ? 1 + (minDst - 1) * division: 1 - minDst * division;
-    return _IsAssociateTex ? result * 0.5 : minDst;
+    return _IsAssociateTex ? result * 0.5 : minDst * division;
 }
 
 [numthreads(SIZEX, SIZEY, 1)]
@@ -155,6 +153,6 @@ void BlackWhite (uint3 id : SV_DispatchThreadID)
     uint width, height;
     _OriginTexture.GetDimensions(width, height);
     float result = ExpandCalculate(id.xy, width);
-    result = _IsInvert ? 1 - result : result;
-    SDFResult[id.xy] = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
+    result = Remap(_MapValue.x, _MapValue.y, 0, 1, result);
+    SDFResult[id.xy] = _IsInvert ? 1 - result : result;
 }

@@ -83,6 +83,14 @@ namespace Custom.Noise
             }
         }
 
+        private void OnDestroy()
+        {
+            foreach (var buffer in buffersToRelease)
+            {
+                buffer.Release();
+            }
+        }
+
         private RenderTexture CreateRenderTexture(int width, int height, RenderTextureFormat format)
         {
             RenderTexture rt = new RenderTexture(width, height, 0, format);
@@ -282,7 +290,11 @@ namespace Custom.Noise
             if (noiseBases[(int)Channel.B].Layer01.isUsed) { validDataCount ++; tempNoiseBase = noiseBases[(int)Channel.B]; }
             if (noiseBases[(int)Channel.A].Layer01.isUsed) { validDataCount ++; tempNoiseBase = noiseBases[(int)Channel.A]; }
             
-            if (validDataCount == 0) return;
+            if (validDataCount == 0)
+            {
+                EditorUtility.DisplayDialog("无输出结果!", "最少需要一个通道有结果!", "确定");
+                return;
+            }
             else if (validDataCount == 1) 
             {
                 RenderTexture grayRT = CreateRenderTexture(resolution, resolution, RenderTextureFormat.R8);

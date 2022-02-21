@@ -198,6 +198,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Earth
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 687d698e7eb122c45a75105b724412ee, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7869873546869171050, guid: 687d698e7eb122c45a75105b724412ee, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -302,13 +306,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1053846060}
-  m_LocalRotation: {x: 0.9979716, y: -0, z: -0, w: -0.06366132}
+  m_LocalRotation: {x: 0.93118316, y: 0, z: 0, w: 0.36455178}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 187.3, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 137.24, y: 0, z: 0}
 --- !u!95 &1053846063
 Animator:
   serializedVersion: 3
@@ -432,7 +436,7 @@ MonoBehaviour:
   earthTransform: {fileID: 700939458}
   earthRadius: 415.5
   atmosphereHeight: 100
-  atmosphericDensityCtrl: 4.1
+  atmosphericDensityCtrl: 4.82
 --- !u!1 &1710930433
 GameObject:
   m_ObjectHideFlags: 0
