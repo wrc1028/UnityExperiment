@@ -1,0 +1,123 @@
+#pragma kernel Clear
+#pragma kernel SSPR
+#pragma kernel FillHole
+
+#include "UnityCG.cginc"
+// TODO: 关于兼容之后在做
+#define MAXUINT 0xFFFFFFFF
+// 输入
+Texture2D<float4> _CameraDepthTexture;
+Texture2D<float4> _CameraColorTexture;
+float4 _SSPRParam;
+float4 _SSPRParam2;
+float4x4 _InverseViewProjectionMatrix;
+#define _TextureSize float4(1.0 / _SSPRParam.x, 1.0 / _SSPRParam.y, _SSPRParam.xy)
+#define _WaterHeight _SSPRParam.z
+#define _SampleOffset _SSPRParam.w
+#define _FillHoleDst 3
+#define _StretchIntensity _SSPRParam2.x
+#define _StretchThreshold _SSPRParam2.y
+#define _CameraDirY _SSPRParam2.z
+// 输出结果
+RWStructuredBuffer<uint> SSPRBuffer;
+RWTexture2D<float4> SSPRResult;
+// ===============================================
+// 二维坐标转换成一维坐标
+uint GetIndex(uint2 id)
+{
+    return id.y * _TextureSize.z + id.x;
+}
+// 编码
+uint Encode(uint2 id)
+{
+    return id.y << 16 | id.x;
+}
+// 解码
+uint2 Decode(uint encode)
+{
+    return uint2(encode & 0xFFFF, encode >> 16);
+}
+// 获得世界坐标
+float3 GetWorldPositionFromDepth(float depth, float2 uv)
+{
+    #if defined(SHADER_API_GLCORE) || defined (SHADER_API_GLES) || defined (SHADER_API_GLES3)
+        depth = depth * 2 - 1;
+    #endif
+    float4 positionCS = float4(uv * 2.0 - 1.0, depth, 1);
+    float4 positionWS = mul(_InverseViewProjectionMatrix, positionCS);
+    positionWS.xyz /= positionWS.w;
+    return positionWS.xyz;
+}
+// 获得周围的坐标
+uint GetNearbyBuffer(uint2 id, int2 offset)
+{
+    uint2 nearbyID = id + offset;
+    nearbyID.x = clamp(nearbyID.x, 0, _TextureSize.z);
+    nearbyID.y = clamp(nearbyID.y, 0, _TextureSize.w);
+    return SSPRBuffer[GetIndex(nearbyID)];
+}
+// ===============================================
+// 反射前清除贴图和缓存
+[numthreads(8, 8, 1)]
+void Clear (uint3 id : SV_DispatchThreadID)
+{
+    SSPRBuffer[GetIndex(id.xy)] = MAXUINT;
+    SSPRResult[id.xy] = 0;
+}
+// 进行屏幕空间反射计算
+[numthreads(8, 8, 1)]
+void SSPR (uint3 id : SV_DispatchThreadID)
+{
+    half2 uv = id.xy * _TextureSize.xy;
+    half sampleDepth = _CameraDepthTexture[id.xy * _SampleOffset].r;
+    float3 positionWS = GetWorldPositionFromDepth(sampleDepth, uv);
+    // SSPRResult[id.xy] = float4(positionWS, 1);
+    if (positionWS.y > _SSPRParam.z && sampleDepth > 0.001)
+    {
+        float4 positionRWS = float4(positionWS.x, 2 * _SSPRParam.z - positionWS.y, positionWS.z, 1);
+        float4 positionRCS = mul(UNITY_MATRIX_VP, positionRWS);
+        float4 screenPos = ComputeScreenPos(positionRCS);
+        float2 reflectUV = screenPos.xy / screenPos.w;
+        // 伸展uv
+        reflectUV.x = reflectUV.x * 2.0 - 1.0;
+	    float HeightStretch = positionWS.y - _WaterHeight;
+        float AngleStretch = max(0, _CameraDirY);
+        float ScreenStretch = saturate(abs(reflectUV.x) - _StretchThreshold);
+        reflectUV.x *= 1 + HeightStretch * AngleStretch * ScreenStretch * _StretchIntensity;
+	    reflectUV.x = reflectUV.x * 0.5 + 0.5;
+        // limit min value
+        uint2 reflectID = uint2(reflectUV * _TextureSize.zw);
+        uint reflectIndex = GetIndex(reflectID);
+        uint encodeID = Encode(id.xy);
+        InterlockedMin(SSPRBuffer[reflectIndex], encodeID);
+        // SSPRResult[id.xy] = float4(reflectUV, 1, 1);
+    }
+}
+// 填补漏洞
+[numthreads(8, 8, 1)]
+void FillHole (uint3 id : SV_DispatchThreadID)
+{
+    uint encodeID = SSPRBuffer[GetIndex(id.xy)];
+    uint upperBuffer = GetNearbyBuffer(id.xy, int2(0, 1));
+    uint underBuffer = GetNearbyBuffer(id.xy, int2(0, -1));
+    uint leftBuffer = GetNearbyBuffer(id.xy, int2(-1, 0));
+    uint rightBuffer = GetNearbyBuffer(id.xy, int2(1, 0));
+    uint minBuffer = min(min(upperBuffer, underBuffer), min(leftBuffer, rightBuffer));
+
+    uint2 decodeID = Decode(encodeID);
+    uint2 minDecodeID = Decode(minBuffer);
+
+    bool isCanFillHole = true;
+    if (encodeID != MAXUINT)
+    {
+        uint2 offset = decodeID - minDecodeID;
+        isCanFillHole = dot(offset, offset) > _FillHoleDst * _FillHoleDst;
+    }
+    if (isCanFillHole)
+    {
+        decodeID = minDecodeID;
+        encodeID = minBuffer;
+    }
+    if (encodeID != MAXUINT)
+        SSPRResult[id.xy] = _CameraColorTexture[decodeID * _SampleOffset];
+}
