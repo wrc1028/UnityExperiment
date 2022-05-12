@@ -72,9 +72,9 @@ void SSPR (uint3 id : SV_DispatchThreadID)
     half sampleDepth = _CameraDepthTexture[id.xy * _SampleOffset].r;
     float3 positionWS = GetWorldPositionFromDepth(sampleDepth, uv);
     // SSPRResult[id.xy] = float4(positionWS, 1);
-    if (positionWS.y > _SSPRParam.z && sampleDepth > 0.001)
+    if (positionWS.y >_WaterHeight && sampleDepth > 0.001)
     {
-        float4 positionRWS = float4(positionWS.x, 2 * _SSPRParam.z - positionWS.y, positionWS.z, 1);
+        float4 positionRWS = float4(positionWS.x, 2 * _WaterHeight - positionWS.y, positionWS.z, 1);
         float4 positionRCS = mul(UNITY_MATRIX_VP, positionRWS);
         float4 screenPos = ComputeScreenPos(positionRCS);
         float2 reflectUV = screenPos.xy / screenPos.w;
@@ -118,6 +118,6 @@ void FillHole (uint3 id : SV_DispatchThreadID)
         decodeID = minDecodeID;
         encodeID = minBuffer;
     }
-    if (encodeID != MAXUINT)
-        SSPRResult[id.xy] = _CameraColorTexture[decodeID * _SampleOffset];
+    SSPRResult[id.xy] = encodeID != MAXUINT ? float4(_CameraColorTexture[decodeID * _SampleOffset].rgb, 1) : 0;
+
 }

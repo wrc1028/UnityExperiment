@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor;
-
+// 挂载到主相机上
 public class SSPR : MonoBehaviour
 {
     public enum TextureSize { Full = 1, Half = 2, Quarter = 4, Eighth = 8, }
     public TextureSize textureSize = TextureSize.Half;
+    public float waterHeightAdjust = 0;
     public float stretchIntensity = 82.0f;
     public float stretchThreshold = 0;
     /// <summary>
@@ -37,7 +38,7 @@ public class SSPR : MonoBehaviour
         
         stretchIntensity = 81.0f;
         stretchThreshold = 0;
-        reflectParam = new Vector4(Screen.width / (int)textureSize, Screen.height / (int)textureSize, transform.position.y, (float)textureSize);
+        reflectParam = new Vector4(Screen.width / (int)textureSize, Screen.height / (int)textureSize, transform.position.y + waterHeightAdjust, (float)textureSize);
         
 
         SSPRCS = AssetDatabase.LoadAssetAtPath<ComputeShader>(@"Assets\Cases\SSPR\Shaders\SSPR.compute");
@@ -60,7 +61,7 @@ public class SSPR : MonoBehaviour
             SSPRCMD = CommandBufferPool.Get("SSPR");
             int threadGroupsX = Mathf.CeilToInt(reflectParam.x / 8 + 0.0001f);
             int threadGroupsY = Mathf.CeilToInt(reflectParam.y / 8 + 0.0001f);
-            Clear(SSPRCMD, threadGroupsX, threadGroupsY);
+            ClearTexture(SSPRCMD, threadGroupsX, threadGroupsY);
             CalculateSSPR(SSPRCMD, threadGroupsX, threadGroupsY);
             FillHole(SSPRCMD, threadGroupsX, threadGroupsY);
             mainCamera.AddCommandBuffer(CameraEvent.AfterSkybox, SSPRCMD);
@@ -77,20 +78,22 @@ public class SSPR : MonoBehaviour
         CopyCameraColor.Release();
         SSPRCMD.Release();
     }
-    private void OnWillRenderObject() 
+    private void Update() 
     {
         if (SSPRCS == null) return;
         // 设置矩阵
         viewProjectionMatrix = GL.GetGPUProjectionMatrix(mainCamera.projectionMatrix, false) * mainCamera.worldToCameraMatrix;
         Shader.SetGlobalMatrix(inverseViewProjectionMatrixId, viewProjectionMatrix.inverse);
+
         float cameraDirX = mainCamera.transform.eulerAngles.x;
         cameraDirX = cameraDirX > 180 ? cameraDirX - 360 : cameraDirX;
         cameraDirX *= 0.00001f;
         reflectParam2 = new Vector4(stretchIntensity, stretchThreshold, cameraDirX, 1);
+        Shader.SetGlobalVector(reflectionPropId, reflectParam);
         Shader.SetGlobalVector(reflectionProp2Id, reflectParam2);
     }
     // 清楚数据
-    private void Clear(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
+    private void ClearTexture(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
     {
         cmd.SetComputeTextureParam(SSPRCS, ClearKernel, "SSPRResult", SSPRResult);
         cmd.SetComputeBufferParam(SSPRCS, ClearKernel, "SSPRBuffer", SSPRBuffer);
@@ -100,8 +103,6 @@ public class SSPR : MonoBehaviour
     private void CalculateSSPR(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
     {
         // cmd.SetComputeTextureParam(SSPRCS, SSPRKernel, "_CameraColorTexture", cameraColorTexture);
-        cmd.SetComputeVectorParam(SSPRCS, "_Param", reflectParam);
-        // cmd.SetComputeVectorParam(SSPRCS, "_Param2", reflectParam2);
         // cmd.SetComputeTextureParam(SSPRCS, SSPRKernel, "SSPRResult", SSPRResult);
         cmd.SetComputeBufferParam(SSPRCS, SSPRKernel, "SSPRBuffer", SSPRBuffer);
         cmd.DispatchCompute(SSPRCS, SSPRKernel, threadGroupsX, threadGroupsY, 1);
@@ -110,7 +111,6 @@ public class SSPR : MonoBehaviour
     private void FillHole(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
     {
         cmd.SetComputeTextureParam(SSPRCS, FillHoleKernel, "_CameraColorTexture", cameraColorTexture);
-        // cmd.SetComputeVectorParam(SSPRCS, "_Param", reflectParam);
         cmd.SetComputeTextureParam(SSPRCS, FillHoleKernel, "SSPRResult", SSPRResult);
         cmd.SetComputeBufferParam(SSPRCS, FillHoleKernel, "SSPRBuffer", SSPRBuffer);
         cmd.DispatchCompute(SSPRCS, FillHoleKernel, threadGroupsX, threadGroupsY, 1);
