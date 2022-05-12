@@ -5,10 +5,13 @@ using UnityEditor;
 public class SSPR : MonoBehaviour
 {
     public enum TextureSize { Full = 1, Half = 2, Quarter = 4, Eighth = 8, }
+    public bool EnableSSPR = false;
+    private bool isAddSSPRCMD = false;
     public TextureSize textureSize = TextureSize.Half;
     public float waterHeightAdjust = 0;
     public float stretchIntensity = 82.0f;
     public float stretchThreshold = 0;
+    public float edgeFadeAdjust = 0.9f;
     /// <summary>
     /// 所需参数, xy:屏幕尺寸, z:水面高度 
     /// </summary>
@@ -20,8 +23,10 @@ public class SSPR : MonoBehaviour
     private int ClearKernel;
     private int SSPRKernel;
     private int FillHoleKernel;
+    // private int GaussianBlurKernel;
     private RenderTexture cameraColorTexture;
     private RenderTexture SSPRResult;
+    // private RenderTexture SSPRResultBlur;
     private ComputeBuffer SSPRBuffer;
     private uint[] SSPRData;
     
@@ -36,8 +41,6 @@ public class SSPR : MonoBehaviour
         mainCamera = Camera.main;
         mainCamera.depthTextureMode |= DepthTextureMode.Depth;
         
-        stretchIntensity = 81.0f;
-        stretchThreshold = 0;
         reflectParam = new Vector4(Screen.width / (int)textureSize, Screen.height / (int)textureSize, transform.position.y + waterHeightAdjust, (float)textureSize);
         
 
@@ -47,9 +50,11 @@ public class SSPR : MonoBehaviour
             ClearKernel = SSPRCS.FindKernel("Clear");
             SSPRKernel = SSPRCS.FindKernel("SSPR");
             FillHoleKernel = SSPRCS.FindKernel("FillHole");
+            /// GaussianBlurKernel = SSPRCS.FindKernel("GaussianBlur");
             
             cameraColorTexture = CreateRenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
             SSPRResult = CreateRenderTexture((int)reflectParam.x, (int)reflectParam.y, 0, RenderTextureFormat.ARGB32);
+            // SSPRResultBlur = CreateRenderTexture((int)reflectParam.x, (int)reflectParam.y, 0, RenderTextureFormat.ARGB32);
             SSPRData = new uint[(int)(reflectParam.x * reflectParam.y)];
             SSPRBuffer = new ComputeBuffer(SSPRData.Length, sizeof(uint));
             SSPRBuffer.SetData(SSPRData);
@@ -64,6 +69,7 @@ public class SSPR : MonoBehaviour
             ClearTexture(SSPRCMD, threadGroupsX, threadGroupsY);
             CalculateSSPR(SSPRCMD, threadGroupsX, threadGroupsY);
             FillHole(SSPRCMD, threadGroupsX, threadGroupsY);
+            // GaussianBlur(SSPRCMD, threadGroupsX, threadGroupsY);
             mainCamera.AddCommandBuffer(CameraEvent.AfterSkybox, SSPRCMD);
 
             SSPRCMD.SetGlobalTexture(reflectionTextureId, SSPRResult);
@@ -88,7 +94,7 @@ public class SSPR : MonoBehaviour
         float cameraDirX = mainCamera.transform.eulerAngles.x;
         cameraDirX = cameraDirX > 180 ? cameraDirX - 360 : cameraDirX;
         cameraDirX *= 0.00001f;
-        reflectParam2 = new Vector4(stretchIntensity, stretchThreshold, cameraDirX, 1);
+        reflectParam2 = new Vector4(stretchIntensity, stretchThreshold, cameraDirX, edgeFadeAdjust);
         Shader.SetGlobalVector(reflectionPropId, reflectParam);
         Shader.SetGlobalVector(reflectionProp2Id, reflectParam2);
     }
@@ -116,10 +122,12 @@ public class SSPR : MonoBehaviour
         cmd.DispatchCompute(SSPRCS, FillHoleKernel, threadGroupsX, threadGroupsY, 1);
     }
     // 高斯模糊
-    private void GaussianBlur(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
-    {
-
-    }
+    // private void GaussianBlur(CommandBuffer cmd, int threadGroupsX, int threadGroupsY)
+    // {
+    //     cmd.SetComputeTextureParam(SSPRCS, GaussianBlurKernel, "_SSPRResultInput", SSPRResult);
+    //     cmd.SetComputeTextureParam(SSPRCS, GaussianBlurKernel, "SSPRResult", SSPRResultBlur);
+    //     cmd.DispatchCompute(SSPRCS, GaussianBlurKernel, threadGroupsX, threadGroupsY, 1);
+    // }
     private RenderTexture CreateRenderTexture(int width, int height, int depth,RenderTextureFormat format)
     {
         RenderTexture rt = new RenderTexture(width, height, depth, format);

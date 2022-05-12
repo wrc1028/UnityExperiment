@@ -1,11 +1,13 @@
 #pragma kernel Clear
 #pragma kernel SSPR
 #pragma kernel FillHole
+#pragma kernel GaussianBlur
 
 #include "UnityCG.cginc"
 // TODO: 关于兼容之后在做
 #define MAXUINT 0xFFFFFFFF
 // 输入
+Texture2D<float4> _SSPRResultInput; // 用作模糊
 Texture2D<float4> _CameraDepthTexture;
 Texture2D<float4> _CameraColorTexture;
 float4 _SSPRParam;
@@ -18,6 +20,7 @@ float4x4 _InverseViewProjectionMatrix;
 #define _StretchIntensity _SSPRParam2.x
 #define _StretchThreshold _SSPRParam2.y
 #define _CameraDirY _SSPRParam2.z
+#define _FadeAdjust _SSPRParam2.w
 // 输出结果
 RWStructuredBuffer<uint> SSPRBuffer;
 RWTexture2D<float4> SSPRResult;
@@ -118,6 +121,26 @@ void FillHole (uint3 id : SV_DispatchThreadID)
         decodeID = minDecodeID;
         encodeID = minBuffer;
     }
-    SSPRResult[id.xy] = encodeID != MAXUINT ? float4(_CameraColorTexture[decodeID * _SampleOffset].rgb, 1) : 0;
-
+    // TODO: 加一个控制，反正Param2还剩一位
+    float alpha = smoothstep(1, _FadeAdjust, max(abs(decodeID.x * _TextureSize.x * 2 - 1), decodeID.y * _TextureSize.y)); // 
+    SSPRResult[id.xy] = encodeID != MAXUINT ? float4(_CameraColorTexture[decodeID * _SampleOffset].rgb, alpha) : 0;
 }
+
+[numthreads(8, 8, 1)]
+void GaussianBlur (uint3 id : SV_DispatchThreadID)
+{
+    float3 convolutions = float3(0.147761, 0.118318, 0.0947416);
+    float result = 0;
+    for (int x = -1; x < 2; x++)
+    {
+        for (int y = -1; y < 2; y++)
+        {
+            int indexX = clamp(id.x + x, 0, _TextureSize.z);
+            int indexY = clamp(id.y + y, 0, _TextureSize.w);
+            float convolution = (abs(x) | abs(y)) == 0 ? convolutions.x : ((abs(x) | abs(y)) == 1 ? convolutions.y : convolutions.z);
+            result += _SSPRResultInput[int2(indexX, indexY)].a * convolution;
+        }
+    }
+    SSPRResult[id.xy] = float4(_SSPRResultInput[id.xy].rgb, _SSPRResultInput[id.xy].a == 0 ? 0 : result);
+}
+
