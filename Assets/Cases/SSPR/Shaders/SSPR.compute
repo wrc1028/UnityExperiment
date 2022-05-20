@@ -13,6 +13,7 @@ Texture2D<float4> _CameraColorTexture;
 float4 _SSPRParam;
 float4 _SSPRParam2;
 float4x4 _InverseViewProjectionMatrix;
+
 #define _TextureSize float4(1.0 / _SSPRParam.x, 1.0 / _SSPRParam.y, _SSPRParam.xy)
 #define _WaterHeight _SSPRParam.z
 #define _SampleOffset _SSPRParam.w
@@ -74,8 +75,9 @@ void SSPR (uint3 id : SV_DispatchThreadID)
     half2 uv = id.xy * _TextureSize.xy;
     half sampleDepth = _CameraDepthTexture[id.xy * _SampleOffset].r;
     float3 positionWS = GetWorldPositionFromDepth(sampleDepth, uv);
+    if (Linear01Depth(sampleDepth) > 0.6) return;
     // SSPRResult[id.xy] = float4(positionWS, 1);
-    if (positionWS.y >_WaterHeight && sampleDepth > 0.001)
+    if (positionWS.y > (_WaterHeight - 0.2) && sampleDepth > 0.0001)
     {
         float4 positionRWS = float4(positionWS.x, 2 * _WaterHeight - positionWS.y, positionWS.z, 1);
         float4 positionRCS = mul(UNITY_MATRIX_VP, positionRWS);
@@ -121,9 +123,9 @@ void FillHole (uint3 id : SV_DispatchThreadID)
         decodeID = minDecodeID;
         encodeID = minBuffer;
     }
-    // TODO: 加一个控制，反正Param2还剩一位
-    float alpha = smoothstep(1, _FadeAdjust, max(abs(decodeID.x * _TextureSize.x * 2 - 1), decodeID.y * _TextureSize.y)); // 
+    float alpha = smoothstep(1, _FadeAdjust, decodeID.y * _TextureSize.y); // max(abs(decodeID.x * _TextureSize.x * 2 - 1), decodeID.y * _TextureSize.y)
     SSPRResult[id.xy] = encodeID != MAXUINT ? float4(_CameraColorTexture[decodeID * _SampleOffset].rgb, alpha) : 0;
+    // SSPRResult[id.xy] = float4(decodeID * _TextureSize.xy, 1, 1);
 }
 
 [numthreads(8, 8, 1)]
