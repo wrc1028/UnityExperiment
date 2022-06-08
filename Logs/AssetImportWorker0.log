@@ -1,6 +1,6 @@
 Using pre-set license
 Built from '2020.3/china_unity/release' branch; Version is '2020.3.12f1c1 (5887f62ce680) revision 5801974'; Using compiler version '192528614'; Build Type 'Release'
-OS: 'Windows 10 Home; OS build 19043.1526; Version 2009; 64bit' Language: 'zh' Physical Memory: 65310 MB
+OS: 'Windows 10 Enterprise; OS build 19043.1706; Version 2009; 64bit' Language: 'zh' Physical Memory: 16097 MB
 BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
 
  COMMAND LINE ARGUMENTS:
@@ -11,63 +11,63 @@ C:\Program Files\Unity\Hub\Editor\2020.3.12f1c1\Editor\Unity.exe
 -name
 AssetImportWorker0
 -projectPath
-D:/UnityProject/UnityExperiment
+E:/UnityProjects/UnityExperiment
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-50400
-Successfully changed project path to: D:/UnityProject/UnityExperiment
-D:/UnityProject/UnityExperiment
+51304
+Successfully changed project path to: E:/UnityProjects/UnityExperiment
+E:/UnityProjects/UnityExperiment
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 41.37 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 41.00 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.12f1c1 (5887f62ce680)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path D:/UnityProject/UnityExperiment/Assets
+[Subsystems] Discovering subsystems at path E:/UnityProjects/UnityExperiment/Assets
 GfxDevice: creating device client; threaded=0
 Direct3D:
     Version:  Direct3D 11.0 [level 11.1]
-    Renderer: NVIDIA GeForce RTX 2060 (ID=0x1f08)
+    Renderer: NVIDIA GeForce GTX 1660 SUPER (ID=0x21c4)
     Vendor:   
-    VRAM:     5980 MB
-    Driver:   27.21.14.6663
+    VRAM:     5991 MB
+    Driver:   27.21.14.6192
 Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
 Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56168
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56060
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.12f1c1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.001522 seconds.
+Registered in 0.001642 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 41.40 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 41.04 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.680 seconds
+- Completed reload, in  0.615 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.003840 seconds.
+Registered in 0.003905 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 41.47 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 41.41 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.249 seconds
+- Completed reload, in  1.254 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.04 seconds
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
 Refreshing native plugins compatible for Editor in 0.55 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 2943 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 129.7 MB.
-System memory in use after: 129.9 MB.
+Unloading 2947 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 128.1 MB.
+System memory in use after: 128.3 MB.
 
-Unloading 32 unused Assets to reduce memory usage. Loaded Objects now: 3433.
-Total: 19.879500 ms (FindLiveObjects: 0.321800 ms CreateObjectMapping: 0.126600 ms MarkObjects: 19.349100 ms  DeleteObjects: 0.080900 ms)
+Unloading 32 unused Assets to reduce memory usage. Loaded Objects now: 3426.
+Total: 20.495700 ms (FindLiveObjects: 0.312700 ms CreateObjectMapping: 0.139200 ms MarkObjects: 19.959300 ms  DeleteObjects: 0.082900 ms)
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
@@ -81,24 +81,39 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  path: Assets/Cases/AtmosphericScattering/Resources/Earth.fbx
-  artifactKey: Guid(687d698e7eb122c45a75105b724412ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Cases/AtmosphericScattering/Resources/Earth.fbx using Guid(687d698e7eb122c45a75105b724412ee) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fa2bbc71f0647e34394892cfa9823ee3') in 0.138565 seconds 
-  Import took 0.142805 seconds .
+  path: Assets/Scenes/SSR.unity
+  artifactKey: Guid(0ef3c5822c6926748b2256947e48c23b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/SSR.unity using Guid(0ef3c5822c6926748b2256947e48c23b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bdb315ba0782ed082d8a57add54702cc') in 0.009354 seconds 
+  Import took 0.013176 seconds .
 
 ========================================================================
-Received Import Request.
-  Time since last request: 0.000208 seconds.
-  path: Assets/Cases/Portal/Resources/Door.FBX
-  artifactKey: Guid(4f21dd88b8d2a3e4db42c1774ec1ef51) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Cases/Portal/Resources/Door.FBX using Guid(4f21dd88b8d2a3e4db42c1774ec1ef51) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ae555012be3939d016af981b39d915cf') in 0.030543 seconds 
-  Import took 0.034123 seconds .
+Received Prepare
+Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
+Refreshing native plugins compatible for Editor in 3.67 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 25 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 65.3 MB.
+System memory in use after: 65.5 MB.
 
+Unloading 25 unused Assets to reduce memory usage. Loaded Objects now: 3426.
+Total: 20.501600 ms (FindLiveObjects: 0.291500 ms CreateObjectMapping: 0.147600 ms MarkObjects: 20.037100 ms  DeleteObjects: 0.023900 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000189 seconds.
-  path: Assets/Cases/Portal/Resources/SingeScene.obj
-  artifactKey: Guid(0dcf4077c04083040a4a467099979f9b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Cases/Portal/Resources/SingeScene.obj using Guid(0dcf4077c04083040a4a467099979f9b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0a9a0324412e8aa7942a6e5cfcad2257') in 1.031084 seconds 
-  Import took 1.036624 seconds .
+  Time since last request: 51.705697 seconds.
+  path: Assets/Cases/SSR/Shaders/SSR.mat
+  artifactKey: Guid(b083be1938c38c746b5b004fcac3832c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Cases/SSR/Shaders/SSR.mat using Guid(b083be1938c38c746b5b004fcac3832c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '29f5a769ac63b30de510cfd47a76f052') in 0.124583 seconds 
+  Import took 0.130405 seconds .
 
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file

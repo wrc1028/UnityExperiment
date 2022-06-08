@@ -1,5 +1,5 @@
 using System;
-using System.Reflection.Emit;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 using Sirenix.OdinInspector;
@@ -74,14 +74,33 @@ public class SDFCalculate : MonoBehaviour
         RenderTexture originRT = CreateRenderTexture(tex2D.width, tex2D.height, RenderTextureFormat.ARGB32);
         RenderTexture resultRT = CreateRenderTexture(tex2D.width, tex2D.height, RenderTextureFormat.ARGB32);
         Graphics.Blit(tex2D, originRT);
-        CS.SetTexture(0, "_MulitGrayTexture", originRT);
-        CS.SetTexture(0, "SDFResult", resultRT);
+        CS.SetTexture(0, "_SDF", originRT);
+        CS.SetTexture(0, "Result", resultRT);
         int threadGroupsX = Mathf.CeilToInt(originRT.width / 32 + 0.001f);
         int threadGroupsY = Mathf.CeilToInt(originRT.height / 32 + 0.001f);
         CS.Dispatch(0, threadGroupsX, threadGroupsY, 1);
         GetComponent<MeshRenderer>().sharedMaterial.mainTexture = resultRT;
+        SaveRT2Texture(string.Format(@"Assets\Cases\SDF\sdf{0}.PNG", UnityEngine.Random.value), resultRT);
     }
     #endregion
     
+    private void SaveRT2Texture(string savePath, RenderTexture rt)
+        {
+            Texture2D tex2D = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false);
+            RenderTexture prev = RenderTexture.active;
+            RenderTexture.active = rt;
+            tex2D.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            tex2D.Apply();
+            RenderTexture.active = prev;
+
+            Byte[] texBytes = tex2D.EncodeToPNG();
+            FileStream texFile = File.Open(savePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryWriter texWriter = new BinaryWriter(texFile);
+            texWriter.Write(texBytes);
+            texFile.Close();
+            Texture2D.DestroyImmediate(tex2D);
+            tex2D = null;
+            AssetDatabase.Refresh();
+        }
     
 }

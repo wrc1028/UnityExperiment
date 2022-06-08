@@ -30,12 +30,11 @@ namespace Custom.Terrain
             normals = GenerateNormals(new Vector2Int(xSubdivision, ySubdivision));
             // 重新计算Vertex、Normal
             CalculateVertexes(ref vertexes, perlinNoiseTex, 1);
-            CalculateNormals(ref normals, perlinNoiseTex, 1);
-            Mesh mesh = new Mesh();
+            CalculateNormals(ref normals, ref vertexes);
+            Mesh mesh = new Mesh() { name = "Custom Mesh" };
             mesh.vertices = vertexes;
             mesh.triangles = triangles;
             mesh.normals = normals;
-            mesh.RecalculateNormals();
             mesh.uv = uv;
             GetComponent<MeshFilter>().mesh = mesh;
         }
@@ -77,20 +76,21 @@ namespace Custom.Terrain
             buffer.Dispose();
             buffer.Release();
         }
-        private void CalculateNormals(ref Vector3[] normals, Texture2D perlinNoise, float heightMultiplier)
+        private void CalculateNormals(ref Vector3[] normals, ref Vector3[] vertexes)
         {
-            RenderTexture noiseRT = GetRenderTexture(perlinNoise.width, perlinNoise.height, RenderTextureFormat.Default);
-            Graphics.Blit(perlinNoise, noiseRT);
+            ComputeBuffer normalBuffer = new ComputeBuffer(normals.Length, sizeof(float) * 3);
+            normalBuffer.SetData(normals);
+            generateMesh.SetBuffer(1, "Normals", normalBuffer);
 
-            ComputeBuffer buffer = new ComputeBuffer(normals.Length, sizeof(float) * 3);
-            buffer.SetData(normals);
-            generateMesh.SetBuffer(1, "Normals", buffer);
+            ComputeBuffer vertexeBuffer = new ComputeBuffer(vertexes.Length, sizeof(float) * 3);
+            vertexeBuffer.SetData(vertexes);
+            generateMesh.SetBuffer(1, "Vertexes", vertexeBuffer);
+
             generateMesh.SetInts("_Subdivision", xSubdivision, ySubdivision);
-            generateMesh.SetTexture(1, "_TerrainNoiseTexture", noiseRT);
             generateMesh.Dispatch(1, Mathf.CeilToInt(normals.Length / 1024 + 0.0001f), 1, 1);
-            buffer.GetData(normals);
-            buffer.Dispose();
-            buffer.Release();
+            normalBuffer.GetData(normals);
+            normalBuffer.Dispose();
+            normalBuffer.Release();
         }
 
         private Vector2[] GenerateUV(Vector2Int subdivision)

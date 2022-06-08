@@ -4,6 +4,7 @@
 
 RWStructuredBuffer<float3> Vertexes;
 RWStructuredBuffer<float3> Normals;
+
 int2 _Subdivision;
 Texture2D<float4> _TerrainNoiseTexture;
 SamplerState linearClampSampler;
@@ -22,19 +23,34 @@ void CalculateVertexes (uint2 id : SV_DISPATCHTHREADID)
     Vertexes[id.x].y = _TerrainNoiseTexture.SampleLevel(linearClampSampler, uv, 0).r * 5;
 }
 
+uint GetRoundIndex(uint index, int2 offset, int2 subdivision)
+{
+    int xIndex = index % (subdivision.x + 1) + offset.x;
+    int yIndex = floor(index / (subdivision.x + 1)) + offset.y;
+    xIndex = xIndex < 0 ? 0 : (xIndex == subdivision.x + 1 ? subdivision.x : xIndex);
+    yIndex = yIndex < 0 ? 0 : (yIndex == subdivision.y + 1 ? subdivision.y : yIndex);
+    return yIndex * (subdivision.x + 1) + xIndex;
+}
+
 [numthreads(1024, 1, 1)]
 void CalculateNormals (uint2 id : SV_DISPATCHTHREADID)
 {
-    float2 uv = GetUVFromIndex(id.x, _Subdivision);
-    float offsetX = 1.0 / _Subdivision.x;
-    float offsetY = 1.0 / _Subdivision.y;
-
-    float upHeight = _TerrainNoiseTexture.SampleLevel(linearClampSampler, uv + float2(0, offsetY), 0).r;
-    float downHeight = _TerrainNoiseTexture.SampleLevel(linearClampSampler, uv - float2(0, offsetY), 0).r;
-    float leftHeight = _TerrainNoiseTexture.SampleLevel(linearClampSampler, uv - float2(offsetX, 0), 0).r;
-    float rightHeight = _TerrainNoiseTexture.SampleLevel(linearClampSampler, uv + float2(offsetX, 0), 0).r;
-    
-    float3 downToUp = float3(0, upHeight - downHeight, offsetY * 2);
-    float3 leftToRight = float3(offsetX * 2, rightHeight - leftHeight, 0);
-    Normals[id.x] = normalize(cross(normalize(downToUp), normalize(leftToRight)));
+    uint roundIndex[6];
+    roundIndex[0] = GetRoundIndex(id.x, int2(0, 1), _Subdivision);
+    roundIndex[1] = GetRoundIndex(id.x, int2(1, 1), _Subdivision);
+    roundIndex[2] = GetRoundIndex(id.x, int2(1, 0), _Subdivision);
+    roundIndex[3] = GetRoundIndex(id.x, int2(0, -1), _Subdivision);
+    roundIndex[4] = GetRoundIndex(id.x, int2(-1, -1), _Subdivision);
+    roundIndex[5] = GetRoundIndex(id.x, int2(-1, 0), _Subdivision);
+    float3 normalResult = 0;
+    for (uint i = 0; i < 6; i++)
+    {
+        uint nextIndex = i + 1 == 6 ? 0 : i + 1;
+        if (roundIndex[i] == roundIndex[nextIndex] || roundIndex[i] == id.x || roundIndex[nextIndex] == id.x) continue;
+        // 计算面法线
+        float3 direction01 = Vertexes[roundIndex[i]] - Vertexes[id.x];
+        float3 direction02 = Vertexes[roundIndex[nextIndex]] - Vertexes[id.x];
+        normalResult += normalize(cross(direction01, direction02));
+    }
+    Normals[id.x] = normalize(normalResult);
 }

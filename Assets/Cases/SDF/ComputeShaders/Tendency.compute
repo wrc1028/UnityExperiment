@@ -1,0 +1,33 @@
+#pragma kernel CSMain
+
+Texture2D<float> _SDF;
+RWTexture2D<float4> Result;
+
+int LimitLineRange(int vaule, int resolution)
+{
+    if (vaule < 0) return 0;
+    else if (vaule > resolution - 1) return resolution - 1;
+    else return vaule;
+}
+
+[numthreads(32, 32, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _SDF.GetDimensions(width, height);
+    float currentValue = _SDF[id.xy];
+    half2 direction = 0;
+    for (int x = -4; x < 5; x++)
+    {
+        for (int y = -4; y < 5; y++)
+        {
+            int xIndex = LimitLineRange(id.x + x, width);
+            int yIndex = LimitLineRange(id.y + y, height);
+            if (currentValue >= _SDF[int2(xIndex, yIndex)]) continue;
+            int2 localPos = id.xy - int2(xIndex, yIndex);
+            half weight = 1 / sqrt(dot(localPos, localPos));
+            direction += weight * normalize(localPos);
+        }
+    }
+    Result[id.xy] = float4(currentValue, normalize(direction) * 0.5 + 0.5, 1);
+}

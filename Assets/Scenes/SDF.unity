@@ -334,8 +334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5214b39a729af8c4e8aa2362bc98e115, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tex2D: {fileID: 2800000, guid: 8dcf0cd68a7eced4ab5519d0280a62ab, type: 3}
-  CS: {fileID: 7200000, guid: ae674aaf2cbc87747bf72f038a25ae4d, type: 3}
+  tex2D: {fileID: 2800000, guid: 80b59c133dbe3fe49b792054abddf26f, type: 3}
+  CS: {fileID: 7200000, guid: ee5858cd2b189c6499907a2ac24f8ce9, type: 3}
 --- !u!64 &1547642785
 MeshCollider:
   m_ObjectHideFlags: 0

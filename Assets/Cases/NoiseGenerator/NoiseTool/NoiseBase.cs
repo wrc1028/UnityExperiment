@@ -18,6 +18,7 @@ namespace Custom.Noise
     public enum Resolution2D { _32x32 = 32, _64x64 = 64, _128x128 = 128, _256x256 = 256, _512x512 = 512, _1024x1024 = 1024, _2048x2048 = 2048, }
     public enum SaveType { PNG, JPG, TGA, }
     public enum Resolution3D { _32x32 = 32, _64x64 = 64, _128x128 = 128, _256x256 = 256, }
+    public enum MixType { Uniform, FBM, FBM_Cell, Custom}
 
     public enum NoiseType { Hashing, Worley, Perlin, }
 
@@ -35,7 +36,6 @@ namespace Custom.Noise
     {
         public struct NoiseData
         {
-            public bool isUsed;
             public float mixWeight;
             public NoiseType noiseType;
             public int cellNums;
@@ -45,45 +45,22 @@ namespace Custom.Noise
             public float minValue;
             public float maxValue;
         }
-        public NoiseData Layer01;
-        public NoiseData Layer02;
-        public NoiseData Layer03;
-        public NoiseData Layer04;
-        public Vector4 MixWeight 
-        { 
-            get
-            {
-                Vector4 weight = new Vector4(Layer01.mixWeight, Layer02.mixWeight, Layer03.mixWeight, Layer04.mixWeight);
-                return weight.normalized;
-            }
-        }
+        public int noiseLayerCount;
+        public MixType mixType;
+        public NoiseData[] layers;
         
         public NoiseBase()
         {
-            Layer01.isUsed = false;
-            Layer01.mixWeight = 1;
-            Layer01.cellNums = 4;
-            Layer01.minValue = 0;
-            Layer01.maxValue = 1;
-            CreateRandomValue(out Layer01.randomPoints, Layer01.cellNums, Layer01.noiseType);
-
-            Layer02.isUsed = false;
-            Layer02.cellNums = 8;
-            Layer02.minValue = 0;
-            Layer02.maxValue = 1;
-            CreateRandomValue(out Layer02.randomPoints, Layer02.cellNums, Layer02.noiseType);
-
-            Layer03.isUsed = false;
-            Layer03.cellNums = 12;
-            Layer03.minValue = 0;
-            Layer03.maxValue = 1;
-            CreateRandomValue(out Layer03.randomPoints, Layer03.cellNums, Layer03.noiseType);
-
-            Layer04.isUsed = false;
-            Layer04.cellNums = 16;
-            Layer04.minValue = 0;
-            Layer04.maxValue = 1;
-            CreateRandomValue(out Layer04.randomPoints, Layer04.cellNums, Layer04.noiseType);
+            layers = new NoiseData[4];
+            mixType = MixType.Uniform;
+            for (int i = 0; i < 4; i++)
+            {
+                layers[i].mixWeight = i == 0 ? 1 : 0;
+                layers[i].cellNums = 4 * (i + 1);
+                layers[i].minValue = 0;
+                layers[i].maxValue = 1;
+                CreateRandomValue(out layers[i].randomPoints, layers[i].cellNums, layers[i].noiseType);
+            }
         }
 
         /// <summary>

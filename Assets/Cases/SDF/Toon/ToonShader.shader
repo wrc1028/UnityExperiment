@@ -63,7 +63,7 @@ Shader "Unlit/ToonShader"
                 half g = tex2D(_MainTexf, i.uv).r;
                 half h = tex2D(_MainTexg, i.uv).r;
                 half j = tex2D(_MainTexh, i.uv).r;
-                half result = (a + b + c + d + f + g + h + j) / 8;
+                half result = (a + b + c + d + f) / 5;
                 return half4(result.xxx, 1);
             }
             ENDCG
