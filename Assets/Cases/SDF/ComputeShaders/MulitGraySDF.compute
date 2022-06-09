@@ -141,7 +141,7 @@ float ExpandCalculate(int2 pixelID, int resolution)
         limitExpand = result2 - expand * expand;
         expand ++;
     }
-    float division = 1.0 / (resolution * 0.4);
+    float division = 1.0 / resolution;
     float minDst = sqrt(result2);
     float result = pixelValue == 1 ? 1 + (minDst - 1) * division: 1 - minDst * division;
     return _IsAssociateTex ? result * 0.5 : minDst * division;

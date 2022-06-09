@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 public class SSR : MonoBehaviour
 {
     public bool EnableSSR = true;
+    public GameObject water;
     private bool isAddCMD = false;
     private Camera mainCamera;
     private CommandBuffer copyCameraColorCMD;
@@ -17,6 +18,11 @@ public class SSR : MonoBehaviour
     {
         if (!TryGetComponent<Camera>(out mainCamera)) EnableSSR = false;
         else mainCamera.depthTextureMode = DepthTextureMode.Depth;
+        if (water != null)
+        {
+            water.GetComponent<MeshRenderer>().sharedMaterial.SetVector("_WaterPos", water.transform.position);
+            // Debug.Log(water.transform.position);
+        }
     }
     
     private void OnPreRender() 
