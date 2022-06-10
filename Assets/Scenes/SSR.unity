@@ -784,7 +784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!20 &1969999897
 Camera:
   m_ObjectHideFlags: 0
@@ -858,8 +858,8 @@ MonoBehaviour:
   greenGackground: {fileID: 1056603023}
   volumeScale: {x: 200, y: 100, z: 200}
   resolution: {x: 64, y: 32, z: 64}
-  texture: {fileID: 2800000, guid: 06aedc12ccd1cfa4087f8ef6eade4c08, type: 3}
-  texture1: {fileID: 2800000, guid: 88a877f786bd8704db124f2b309e8ae6, type: 3}
+  texture: {fileID: 2800000, guid: ee67d2dd3d8c5aa4f95568789485c385, type: 3}
+  texture1: {fileID: 2800000, guid: a7c45f91c8dd84a4497f4fa504279542, type: 3}
   texture2: {fileID: 2800000, guid: cc9f151e22121ec42afaa63a5edb32e4, type: 3}
   texture3: {fileID: 2800000, guid: 621e0827001b5064fa575c0f804d93f5, type: 3}
-  volume: {fileID: 11700000, guid: 04a8e463dddbee94885504e5b43ec155, type: 2}
+  volume: {fileID: 11700000, guid: d733dedf0d076804aa8269eeffeedaa4, type: 2}

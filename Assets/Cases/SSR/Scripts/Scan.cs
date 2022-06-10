@@ -68,14 +68,23 @@ public class Scan : MonoBehaviour
         {
             switch (i)
             {
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
                 case 29:
-                    GetColor(texture1, i, ref volumeColors);
-                    break;
                 case 30:
-                    GetColor(texture2, i, ref volumeColors);
-                    break;
                 case 31:
-                    GetColor(texture3, i, ref volumeColors);
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                    GetColor(texture1, i, ref volumeColors);
                     break;
                 default:
                     GetColor(texture, i, ref volumeColors);
@@ -83,7 +92,7 @@ public class Scan : MonoBehaviour
             }
         }
         volume.SetPixels(volumeColors);
-        AssetDatabase.CreateAsset(volume, "Assets/Volume.asset");
+        AssetDatabase.CreateAsset(volume, "Assets/Volume_1.asset");
         AssetDatabase.Refresh();
     }
 
@@ -124,10 +133,10 @@ public class Scan : MonoBehaviour
             colors[whiteID[x]] = new Color(dst / 64, 0, 0, 1);
         }
         
-        Texture3D volumeOut = new Texture3D(64, 64, 64, TextureFormat.R8, 0);
+        Texture3D volumeOut = new Texture3D(64, 64, 64, TextureFormat.R16, 0);
         // volumeOut.filterMode = FilterMode.Point;
         volumeOut.SetPixels(colors);
-        AssetDatabase.CreateAsset(volumeOut, "Assets/Volume_SDF.asset");
+        AssetDatabase.CreateAsset(volumeOut, "Assets/Volume_1_SDF.asset");
         AssetDatabase.Refresh();
     }
     private Vector3Int GetIDFromIndex(int index)

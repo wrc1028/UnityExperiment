@@ -60,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Volume:
-        m_Texture: {fileID: 11700000, guid: 2c610271e5fc6ac458e6cd5fe511ae74, type: 2}
+        m_Texture: {fileID: 11700000, guid: 73176ad7eea43d547ab3dc0c21dbd46d, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _WaterSDF:
@@ -82,11 +82,11 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StepSize: 0.01
+    - _StepSize: 0.4
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0, g: 1, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _WaterInfo: {r: 200, g: 200, b: 200, a: 0.1}
+    - _WaterInfo: {r: 200, g: 200, b: 200, a: 1}
   m_BuildTextureStacks: []

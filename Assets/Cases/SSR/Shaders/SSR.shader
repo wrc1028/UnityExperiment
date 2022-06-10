@@ -2,7 +2,7 @@ Shader "Unlit/SSR"
 {
     Properties
     {
-        _Volume ("Volume", 3D) = "White" {}
+        _Volume ("Volume SDF", 3D) = "White" {}
         _WaterSDF ("Water SDF", 2D) = "White" {}
         _SkyboxCube ("Skybox", Cube) = "Skybox" {}
         _WaterInfo ("Water Info", vector) = (0, 0, 0, 0)
@@ -58,14 +58,17 @@ Shader "Unlit/SSR"
 				o.worldNormal = UnityObjectToWorldDir(v.normal);
 				return o;
             }
-
-            float GetMarchDst(float3 positionWS)
+            float SampleVolumeSDF(float3 positionWS)
             {
                 float3 relativePos = positionWS - _WaterPos;
                 float3 uvw = (relativePos + _WaterInfo.xyz / 2) / _WaterInfo.xyz;
                 float3 reUVW = float3(uvw.z, 1 - uvw.x, 1 - uvw.y);
-                float marchDst = tex3D(_Volume, reUVW).r * _WaterInfo.x * _WaterInfo.w;
-                return marchDst > _StepSize * 10 ? marchDst : _StepSize;
+                return tex3D(_Volume, reUVW).r;
+            }
+            float GetMarchDst(float3 positionWS)
+            {
+                float marchDst = SampleVolumeSDF(positionWS) * _WaterInfo.x;
+                return marchDst;
             }
 
             float GetMarchDst(float3 positionWS, half cosAlpha)
@@ -75,8 +78,8 @@ Shader "Unlit/SSR"
 #ifdef UNITY_UV_STARTS_AT_TOP
                 uv.y = 1 - uv.y;
 #endif
-                float marchDst = tex2D(_WaterSDF, uv).r * _WaterInfo.x / cosAlpha;
-                return marchDst > _WaterInfo.z ? marchDst : _StepSize; // tex2D(_WaterSDF, uv).r * _WaterInfo.z; 
+                float marchDst = tex2D(_WaterSDF, uv).r * _WaterInfo.x / cosAlpha * _WaterInfo.w;
+                return marchDst > _StepSize * 10 ? marchDst : _StepSize; // tex2D(_WaterSDF, uv).r * _WaterInfo.z; 
             }
 
             bool GetMarchPointUVAndDepth(float3 rayDestinationWS, out float3 UVAndDepth)
@@ -90,21 +93,19 @@ Shader "Unlit/SSR"
                 UVAndDepth = float3(rayDestinationCS.xy * 0.5 + 0.5, LinearEyeDepth(rayDestinationCS.z));
                 return isOutOfUV01;
             }
-
+            // 可以结合菲涅尔进行计算
             half3 GetSSRColor(float3 positionWS, half3 viewReflectDirWS, half3 normalWS, half3 specColor)
             {
                 // 每Y轴一步的步长
-                half NdotV = dot(viewReflectDirWS, normalWS);
                 float3 rayDestinationWS = positionWS;
                 float3 currentUVAndDepth = 0;
                 float3 prevUVAndDepth = 0;
-                float rayDst = 0;
                 float sampleLinearDepth = 0;
+                half NdotV = dot(normalWS, viewReflectDirWS);
                 UNITY_LOOP
-                for (int index = 0; index < 16; index ++)
+                for (int index = 0; index < 128; index ++)
                 {
-                    rayDst += GetMarchDst(rayDestinationWS);
-                    rayDestinationWS = positionWS + viewReflectDirWS * rayDst;
+                    rayDestinationWS = positionWS + viewReflectDirWS * index * (_StepSize / NdotV);
                     // 采样点超出UV
                     if (GetMarchPointUVAndDepth(rayDestinationWS, currentUVAndDepth)) return specColor;
                     sampleLinearDepth = LinearEyeDepth(tex2D(_CameraDepthTexture, currentUVAndDepth.xy).r);
@@ -118,6 +119,19 @@ Shader "Unlit/SSR"
                     half2 uv = lerp(prevUVAndDepth.xy, currentUVAndDepth.xy, lerpValue);
                     return tex2D(_CustomColorTexture, uv).rgb;
                 }
+            }
+            half3 TestVolumeSDF(float3 positionWS, half3 viewReflectDirWS, half3 specColor)
+            {
+                float3 rayDestinationWS = positionWS;
+                float rayDst = 0;
+                UNITY_LOOP
+                for (int index = 0; index < 16; index ++)
+                {
+                    rayDst += GetMarchDst(rayDestinationWS);
+                    rayDestinationWS = positionWS + viewReflectDirWS * rayDst;
+                    if (SampleVolumeSDF(rayDestinationWS) < 0.01) return 0;
+                }
+                return specColor;
             }
 
             half4 frag (v2f i) : SV_Target
